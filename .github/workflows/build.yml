@@ -23,6 +23,6 @@ jobs:
         uses: s0/git-publish-subdir-action@develop
         with:
           branch: develop
-          folder: dist  # <-- Change this to match your build output directory
+          folder: build  # <-- Change this to match your build output directory
           github_token: ${{ secrets.GITHUB_TOKEN }}
           message: "Build: ({sha}) {msg}"
