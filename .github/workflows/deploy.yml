@@ -26,15 +26,6 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H $HOSTINGER_IP >> ~/.ssh/known_hosts
 
-<<<<<<< HEAD
-      - name: Publish Build to Another Branch
-        uses: s0/git-publish-subdir-action@develop
-        with:
-          branch: develop
-          folder: build  # <-- CHANGE THIS IF YOUR BUILD OUTPUT IS IN A DIFFERENT FOLDER
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          message: "Build: ({sha}) {msg}"
-=======
           # SSH into Hostinger and deploy
           ssh $HOSTINGER_USER@$HOSTINGER_IP << 'EOF'
             cd $PROJECT_PATH
@@ -47,4 +38,3 @@ jobs:
             php artisan view:clear
             php artisan queue:restart
           EOF
->>>>>>> 77bfa228558eae2672c63c944c9d9ff611439bf3
