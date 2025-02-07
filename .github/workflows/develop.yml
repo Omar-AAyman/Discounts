@@ -22,6 +22,7 @@ jobs:
       - name: Publish Build to Another Branch
         uses: s0/git-publish-subdir-action@develop
         with:
+          REPO: self  # Must specify the repo
           branch: develop
           folder: build  # <-- CHANGE THIS IF YOUR BUILD OUTPUT IS IN A DIFFERENT FOLDER
           github_token: ${{ secrets.GITHUB_TOKEN }}
