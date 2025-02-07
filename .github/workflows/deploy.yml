@@ -20,10 +20,9 @@ jobs:
         run: npm run build
 
       - name: Publish Build to Another Branch
-        uses: s0/git-publish-subdir-action@develop  # Use "master" instead of "develop"
+        uses: s0/git-publish-subdir-action@develop
         with:
-          repo: self  # Specify "self" to use the current repo
-          branch: build  # Push to "build" branch
-          folder: public/build  # Make sure this is your correct build output folder
+          branch: develop
+          folder: build  # <-- CHANGE THIS IF YOUR BUILD OUTPUT IS IN A DIFFERENT FOLDER
           github_token: ${{ secrets.GITHUB_TOKEN }}
           message: "Build: ({sha}) {msg}"
