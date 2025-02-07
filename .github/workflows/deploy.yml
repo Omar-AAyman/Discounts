@@ -1,4 +1,4 @@
-name: Generate a build and push to another branch
+name: Auto Deploy to Hostinger
 
 on:
   push:
@@ -6,24 +6,35 @@ on:
       - develop
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    name: Build and Push
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Set up SSH and Deploy
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
+          HOSTINGER_IP: ${{ secrets.HOSTINGER_IP }}
+          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
 
-      - name: Build Project
-        run: npm run build
+        run: |
+          # Set up SSH key
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $HOSTINGER_IP >> ~/.ssh/known_hosts
 
-      - name: Publish Build to Another Branch
-        uses: s0/git-publish-subdir-action@develop  # Use "master" instead of "develop"
-        with:
-          repo: self  # Specify "self" to use the current repo
-          branch: build  # Push to "build" branch
-          folder: public/build  # Make sure this is your correct build output folder
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          message: "Build: ({sha}) {msg}"
+          # SSH into Hostinger and deploy
+          ssh $HOSTINGER_USER@$HOSTINGER_IP << 'EOF'
+            cd $PROJECT_PATH
+            git pull origin develop
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+            php artisan config:clear
+            php artisan cache:clear
+            php artisan route:clear
+            php artisan view:clear
+            php artisan queue:restart
+          EOF
