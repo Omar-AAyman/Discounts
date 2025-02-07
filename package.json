@@ -2,7 +2,7 @@
     "private": true,
     "scripts": {
         "dev": "vite",
-        "build": "webpack --output-path=./test"
+        "build": "vite build"
     },
     "devDependencies": {
         "@popperjs/core": "^2.11.6",
