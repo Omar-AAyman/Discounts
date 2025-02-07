@@ -20,7 +20,7 @@ class Authentication extends Controller
 {
 
     public function register(Request $request){
-dd($request,"test");
+dd($request,"test2");
         $data = $request->validate([
             'first_name'=>'required|string',
             'last_name'=>'required|string',
