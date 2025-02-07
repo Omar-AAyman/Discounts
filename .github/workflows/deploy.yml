@@ -20,7 +20,7 @@ jobs:
         run: npm run build
 
       - name: Publish Build to Another Branch
-        uses: s0/git-publish-subdir-action@master  # Use "master" instead of "develop"
+        uses: s0/git-publish-subdir-action@develop  # Use "master" instead of "develop"
         with:
           repo: self  # Specify "self" to use the current repo
           branch: build  # Push to "build" branch
