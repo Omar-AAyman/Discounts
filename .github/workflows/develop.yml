@@ -3,27 +3,26 @@ name: Generate a build and push to another branch
 on:
   push:
     branches:
-      - develop # The branch name your are commit the new changes
+      - develop
 
 jobs:
   build:
     runs-on: ubuntu-latest
     name: Build and Push
     steps:
-      - name: git-checkout
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Install all dependencies
+      - name: Install Dependencies
         run: npm install
 
-      - name: Build
-        run: npm run build # The build command of your project
+      - name: Build Project
+        run: npm run build
 
-      - name: Push
+      - name: Publish Build to Another Branch
         uses: s0/git-publish-subdir-action@develop
-        env:
-          REPO: self
-          BRANCH: develop # The branch name where you want to push the assets
-          FOLDER: discounts # The directory where your assets are generated
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub will automatically add this - you don't need to bother getting a token
-          MESSAGE: "Build: ({sha}) {msg}" # The commit message
+        with:
+          branch: develop
+          folder: dist  # <-- CHANGE THIS IF YOUR BUILD OUTPUT IS IN A DIFFERENT FOLDER
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          message: "Build: ({sha}) {msg}"
