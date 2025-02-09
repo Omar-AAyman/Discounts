@@ -36,17 +36,17 @@ class OfferController extends Controller
         if ($request->hasFile('img')) {
             $image = $request->file('img');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('offerImages'), $imageName);
+            $image->move(public_path('images/offerImages'), $imageName);
             $data['img'] = $imageName;
-           
+
         }
 
         if ($request->hasFile('bg_img')) {
             $image = $request->file('bg_img');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('offerImages'), $imageName);
+            $image->move(public_path('images/offerImages'), $imageName);
             $data['bg_img'] = $imageName;
-           
+
         }
 
         if($request->has('exclusions')){
@@ -66,7 +66,7 @@ class OfferController extends Controller
 
         $data = $this->validateData($request);
         $data['store_id'] = $request->store_id;
-       
+
         Offer::create($data);
 
         return redirect()->route('offers.index')->with('success', 'Offer created successfully.');
@@ -97,7 +97,7 @@ class OfferController extends Controller
         return redirect()->route('offers.index')->with('success', 'Offer updated successfully.');
     }
 
-     
- 
-    
+
+
+
 }

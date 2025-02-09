@@ -29,6 +29,6 @@ class OnBoardingController extends Controller
         ]);
         $onBoarding = OnBoarding::findOrFail($id);
         $onBoarding->update($data);
-        return redirect()->route('onBoardings.index')->with('success','updated successfully');
+        return redirect()->route('onboardings.index')->with('success','updated successfully');
     }
 }

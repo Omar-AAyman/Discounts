@@ -61,10 +61,10 @@ class OptionController extends Controller
 
         $options = Option::whereNotNull('img')->get();
         return view('options.showImages',compact('options'));
-        
+
     }
 
-    // show edit image view 
+    // show edit image view
     public function editImageOption($id){
         $option = Option::findOrFail($id);
         return view ('options.editImage',compact('option'));
@@ -75,16 +75,16 @@ class OptionController extends Controller
 
         if($request->hasFile('img')){
             $image = $request->file('img');
-            $imageName = time().'.'.$image->getClientOriginalName();
-           
-            $image->move(public_path('optionImages'), $imageName);
+            $imageName = time().'_'.$image->getClientOriginalName();
+
+            $image->move(public_path('images/optionImages'), $imageName);
             $option->img = $imageName;
             $option->save();
-  
+
         }
 
         return redirect()->route('options.showImages')->with('success','image was updated successfully');
     }
 
-    
+
 }

@@ -40,17 +40,19 @@ class User extends Authenticatable
         'is_online',
         'uuid',
         'type',
+        'seller_type_id',
         'city',
         'phone2',
         'facebook',
         'instagram',
+        'tiktok',
         'is_sponser',
         'points',
         'is_admin',
         'img',
         'country',
         'fcm_token',
-        'merchant_type',//for sellers
+        'merchant_type', //for sellers
         'representative_type', //for delegates
         'region', // for delegates
         'is_seller',
@@ -84,33 +86,42 @@ class User extends Authenticatable
     ];
 
 
-    public function stores(){
+    public function stores()
+    {
         return $this->hasMany(Store::class);
     }
 
-    public function subscriptions(){
+    public function subscriptions()
+    {
         return $this->hasMany(Subscription::class);
     }
 
-    public function notifications(){
+    public function notifications()
+    {
         return $this->hasMany(Notification::class);
-
     }
 
     public function delegateStores()
     {
         return $this->hasMany(Store::class, 'delegate_id');
     }
+    public function sellerType()
+    {
+        return $this->hasOne(SellerType::class, 'id','seller_type_id');
+    }
 
-    public function tickets(){
+    public function tickets()
+    {
         return $this->hasMany(Ticket::class);
     }
 
-    public function invoices(){
+    public function invoices()
+    {
         return $this->hasMany(Invoice::class);
     }
 
-    public function favorites(){
+    public function favorites()
+    {
         return $this->hasMany(Favorite::class);
     }
 }

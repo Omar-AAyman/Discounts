@@ -14,6 +14,10 @@ class Product extends Model
         'store_id',
         'offer_id',
         'price',
+        'price_before_discount',
+        'discount_percentage',
+        'discount_amount',
+        'is_excluded_from_discount',
         'img',
         'is_online',
     ];
