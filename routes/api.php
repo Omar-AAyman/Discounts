@@ -6,6 +6,7 @@ use App\Http\Controllers\API\ChangePasswordApi;
 use App\Http\Controllers\API\ContactApi;
 use App\Http\Controllers\API\CountriesApi;
 use App\Http\Controllers\API\CustomerRequestApi;
+use App\Http\Controllers\API\DelegateControllerApi;
 use App\Http\Controllers\API\FavoritesApi;
 use App\Http\Controllers\API\InvoicesApi;
 use App\Http\Controllers\API\OffersApi;
@@ -18,6 +19,7 @@ use App\Http\Controllers\API\UserSubscription;
 use App\Http\Controllers\API\VerifyTokenApi;
 use App\Http\Controllers\API\VerifyTokenChangePasswordApi;
 use App\Http\Controllers\API\VerifyTokenRegisterApi;
+use App\Http\Controllers\StoreController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -112,4 +114,17 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     //product requests
     Route::post('/request/product', [CustomerRequestApi::class, 'requestProduct']);
     Route::get('/unconfirmed/product/requests', [CustomerRequestApi::class, 'unconfirmedPurchaseRequests']);
+
+    Route::get('store/discount/{store}', [StoreController::class, 'showDiscount'])->name('store.discount');
+
+    Route::prefix('/delegate')->middleware(['auth', 'is_delegate'])->group(function () {
+        /**
+         * API route for creating different types of sellers.
+         **/
+        Route::post('/seller/store', [DelegateControllerApi::class, 'store']);
+        Route::get('/seller/{sellerId}/edit', [DelegateControllerApi::class, 'edit']);
+        Route::delete('/seller/{sellerId}', [DelegateControllerApi::class, 'destroy']);
+        Route::put('/seller/update', [DelegateControllerApi::class, 'update']);
+        Route::get('/sellers', [DelegateControllerApi::class, 'getRelatedSellers']);
+    });
 });

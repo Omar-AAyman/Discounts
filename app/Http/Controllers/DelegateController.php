@@ -31,29 +31,32 @@ class DelegateController extends Controller
 
     // main view for delegates
 
-    public function mainView(){
+    public function mainView()
+    {
         return view('delegate');
     }
 
     // show the view of adding a seller form
-    public function createSeller(){
-        $sections = Section::where('is_online',1)->get();
-        return view('create-seller',compact('sections'));
+    public function createSeller()
+    {
+        $sections = Section::where('is_online', 1)->get();
+        return view('create-seller', compact('sections'));
     }
 
-    public function addSeller(Request $request){
+    public function addSeller(Request $request)
+    {
         $request->validate([
             'seller_name' => 'required',
             'store_name' => 'required',
             'section_id' => 'required',
-           
+
             'sector_representative' => 'required',
             'location' => 'required',
             'phone_number1' => 'required',
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'working_hours' => 'required|min:1',
             'working_days' => 'required|min:1',
- 
+
         ]);
 
         // Create a new Store instance
@@ -77,26 +80,26 @@ class DelegateController extends Controller
         // Handle image uploads (optional)
         if ($request->hasFile('contract_img')) {
             $image = $request->file('contract_img');
-            $imageName = $image->getClientOriginalName();
+            $imageName = time() . '_' . $image->getClientOriginalName();
 
-            $destinationPath = public_path('ContractImages'); 
+            $destinationPath = public_path('images/contractImages');
             if (!file_exists($destinationPath . '/' . $imageName)) {
 
-            $image->move(public_path('ContractImages'), $imageName);
+                $image->move(public_path('images/contractImages'), $imageName);
             }
-          $store->contract_img = $imageName;
-   }
+            $store->contract_img = $imageName;
+        }
 
         if ($request->hasFile('store_img')) {
             $image = $request->file('store_img');
             $imageName = $image->getClientOriginalName();
 
-            $destinationPath = public_path('StoreImages'); 
+            $destinationPath = public_path('images/storeImages');
             if (!file_exists($destinationPath . '/' . $imageName)) {
 
-            $image->move(public_path('StoreImages'), $imageName);
+                $image->move(public_path('images/storeImages'), $imageName);
             }
-        $store->store_img = $imageName;
+            $store->store_img = $imageName;
         }
 
         $store->status = 'pending';
@@ -105,9 +108,5 @@ class DelegateController extends Controller
 
         // Handle success or failure
         return redirect()->route('delegates.mainView')->with('success', 'request of adding  seller to the system was send successfully');
-
     }
-
-
-
 }

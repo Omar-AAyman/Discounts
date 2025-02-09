@@ -12,9 +12,9 @@ class NewsController extends Controller
      {
          $this->middleware('auth');
      }
- 
+
    public function index(){
-    
+
     $news = News::orderBy('created_at','desc')->get();
     return view('news.index',compact('news'));
 
@@ -29,23 +29,23 @@ class NewsController extends Controller
         $data = $request->validate([
             'title'=>'required',
             'description'=>'required',
-            
+
         ]);
 
         $additional=[];
 
         if ($request->hasFile('img')) {
             $image = $request->file('img');
-            $imageName = $image->getClientOriginalName();
+            $imageName = time() . '_' . $image->getClientOriginalName();
 
-            $destinationPath = public_path('newsImages'); 
+            $destinationPath = public_path('images/newsImages');
             if (!file_exists($destinationPath . '/' . $imageName)) {
 
-            $image->move(public_path('newsImages'), $imageName);
+            $image->move(public_path('images/newsImages'), $imageName);
             }
             $additional = [
                 'img'=>$imageName,
-               
+
             ];
    }
 
@@ -62,7 +62,7 @@ class NewsController extends Controller
 
         return redirect()->route('news.index')->with('success','news was created successfully');
 
-        
+
    }
 
    public function edit($uuid){
