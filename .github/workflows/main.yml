@@ -19,8 +19,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /domains/walldeals.online/public_html/discountsAdmin
-            git pull origin staging
+            cd ./domains/walldeals.online/public_html/discountsAdmin
+            git pull origin develop
             composer install
             composer dump-autoload
             php artisan cache:clear
