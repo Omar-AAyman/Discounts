@@ -38,19 +38,19 @@ class StoreSellerRequest extends FormRequest
 
         switch ((int) $this->header('sellertypeid')) {
             case 1:
+                $rules['discount_percentage'] = 'required|numeric|min:0|max:100';
+                break;
+            case 2:
+                $rules['discount_percentage'] = 'required|numeric|min:0|max:100';
+                $rules['excluded_products'] = 'required|array|min:1';
+                $rules['products.*.name'] = 'required|string';
+                break;
+            case 3:
                 $rules['products'] = 'required|array|min:1';
                 $rules['products.*.name'] = 'required|string';
                 $rules['products.*.price_before_discount'] = 'required|numeric';
                 $rules['products.*.discount_percentage'] = 'nullable|numeric|min:0|max:100';
                 $rules['products.*.discount_amount'] = 'nullable|numeric|min:0';
-                break;
-            case 2:
-                $rules['discount_percentage'] = 'required|numeric|min:0|max:100';
-                break;
-            case 3:
-                $rules['discount_percentage'] = 'required|numeric|min:0|max:100';
-                $rules['excluded_products'] = 'required|array|min:1';
-                $rules['products.*.name'] = 'required|string';
                 break;
         }
 

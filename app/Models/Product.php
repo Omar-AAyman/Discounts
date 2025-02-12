@@ -14,7 +14,6 @@ class Product extends Model
         'store_id',
         'offer_id',
         'price',
-        'price_before_discount',
         'discount_percentage',
         'discount_amount',
         'is_excluded_from_discount',
@@ -36,5 +35,33 @@ class Product extends Model
     public function offer()
     {
         return $this->belongsTo(Offer::class, 'offer_id');
+    }
+
+    public function discountRequests()
+    {
+        return $this->morphMany(DiscountRequest::class, 'discountable');
+    }
+
+    public function getImgAttribute($value)
+    {
+        return $this->getImagePath($value, 'productImages');
+    }
+
+    /**
+     * Helper method to get the image path with folder prefix
+     *
+     * @param string $imageName
+     * @param string $folder
+     * @return string
+     */
+    private function getImagePath($imageName, $folder)
+    {
+        // Check if image exists, then return the path
+        if ($imageName) {
+            // Adjust the path to work with public_html and the images folder
+            return url("images/{$folder}/{$imageName}");
+        }
+
+        return null;
     }
 }

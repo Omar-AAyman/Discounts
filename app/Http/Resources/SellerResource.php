@@ -37,7 +37,7 @@ class SellerResource extends JsonResource
                 'last_name' => $this->seller->last_name,
                 'email' => $this->seller->email,
                 'phone' => $this->seller->phone,
-                'phone2' => $this->seller->phone2,
+                'whatsapp_number' => $this->seller->phone2,
                 'seller_type_id' => $this->seller->seller_type_id,
                 'seller_type_ar_description' => $this->seller->sellerType->ar_description,
                 'seller_type_en_description' => $this->seller->sellerType->en_description,
@@ -50,9 +50,11 @@ class SellerResource extends JsonResource
                 'store_img' => $this->store->store_img ?? null,
                 'contract_img' => $this->store->contract_img ?? null,
                 'description' => $this->store->description ?? null,
+                'section_id' => $this->store->section_id ?? null,
                 'discount_percentage' => $this->store->discount_percentage ? $this->store->discount_percentage . '%' : null,
                 'sector_representative' => $this->store->sector_representative ?? null,
-                'sector_qr' =>  $this->store->getSectoreQrAttribute($this->store->sector_qr)?? null,
+                'location' => $this->store->location ?? null,
+                'sector_qr' =>  $this->store->getSectoreQrAttribute($this->store->sector_qr) ?? null,
                 'work_hours' => $this->store->work_hours ?? null,
                 'work_days' => json_decode($this->store->work_days) ?? [],
                 'status' => $this->store->status ?? 'pending',
@@ -64,16 +66,22 @@ class SellerResource extends JsonResource
                     return [
                         'id' => $product->id,
                         'name' => $product->name,
-                        'price_before_discount' => $product->price_before_discount,
+                        'price_before_discount' => $product->price,
+                        'price_after_discount' => $product->discount_percentage
+                            ? $product->price - ($product->price * ($product->discount_percentage / 100))
+                            : $product->price - $product->discount_amount,
                         'discount_percentage' => $product->discount_percentage ? $product->discount_percentage . '%' : null,
                         'discount_amount' => $product->discount_amount,
                     ];
                 }) ?? [],
                 'excluded_products' => $excludedProducts->map(function ($product) {
                     return [
-                        'id' => $product->id?? null,
+                        'id' => $product->id ?? null,
                         'name' => $product->name,
-                        'price_before_discount' => $product->price_before_discount,
+                        'price_before_discount' => $product->price,
+                        'price_after_discount' => $product->discount_percentage
+                            ? $product->price - ($product->price * ($product->discount_percentage / 100))
+                            : $product->price - $product->discount_amount,
                         'discount_percentage' => $product->discount_percentage ? $product->discount_percentage . '%' : null,
                         'discount_amount' => $product->discount_amount,
                     ];

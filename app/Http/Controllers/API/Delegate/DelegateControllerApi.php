@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Delegate;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSellerRequest;
@@ -179,6 +179,11 @@ class DelegateControllerApi extends Controller
                         ['status' => true] // Active by default
                     );
                 }
+            }
+
+            // Handle branch deletions
+            if (!empty($request->deleted_branches_ids) && is_array($request->deleted_branches_ids)) {
+                StoreBranch::whereIn('id', $request->deleted_branches_ids)->where('store_id', $store->id)->delete();
             }
 
             // Apply seller-specific logic using Strategy Pattern
