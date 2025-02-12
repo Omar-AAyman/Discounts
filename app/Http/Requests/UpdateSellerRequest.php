@@ -19,12 +19,12 @@ class UpdateSellerRequest extends FormRequest
             'first_name' => 'required|string',
             'last_name' => 'required|string',
             'email' => [
-                'required',
+                'nullable',
                 'email',
                 Rule::unique('users', 'email')->ignore($this->getSellerIdFromHeader()),
             ],
             'phone' => [
-                'required',
+                'nullable',
                 'string',
                 'max:15',
                 Rule::unique('users', 'phone')->ignore($this->getSellerIdFromHeader()),
@@ -37,7 +37,7 @@ class UpdateSellerRequest extends FormRequest
             'store_img' => 'nullable|mimes:jpg,png,jpeg,gif,svg',
 
             'store_name' => 'required',
-            'section_id' => 'required|exists:sections,id',
+            'section_id' => 'nullable|exists:sections,id',
 
             'sector_representative' => 'required',
             'work_hours' => 'required',
@@ -48,19 +48,19 @@ class UpdateSellerRequest extends FormRequest
 
         switch ($this->getSellerTypeId()) {
             case 1:
+                $rules['discount_percentage'] = 'required|numeric|min:0|max:100';
+                break;
+            case 2:
+                $rules['discount_percentage'] = 'required|numeric|min:0|max:100';
+                $rules['excluded_products'] = 'required|array|min:1';
+                $rules['products.*.name'] = 'required|string';
+                break;
+            case 3:
                 $rules['products'] = 'required|array|min:1';
                 $rules['products.*.name'] = 'required|string';
                 $rules['products.*.price_before_discount'] = 'required|numeric';
                 $rules['products.*.discount_percentage'] = 'nullable|numeric|min:0|max:100';
                 $rules['products.*.discount_amount'] = 'nullable|numeric|min:0';
-                break;
-            case 2:
-                $rules['discount_percentage'] = 'required|numeric|min:0|max:100';
-                break;
-            case 3:
-                $rules['discount_percentage'] = 'required|numeric|min:0|max:100';
-                $rules['excluded_products'] = 'required|array|min:1';
-                $rules['products.*.name'] = 'required|string';
                 break;
         }
 
@@ -69,7 +69,11 @@ class UpdateSellerRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
+            // Get the seller ID from the header, fallback to auth if not present
             $sellerId = $this->getSellerIdFromHeader();
+
+            // Debugging the sellerId (remove or comment out dd() after testing)
+            // dd($sellerId);
 
             if (!$sellerId) {
                 $validator->errors()->add('sellerId', 'Seller ID is required in the header.');
@@ -84,19 +88,23 @@ class UpdateSellerRequest extends FormRequest
             }
         });
     }
+
     /**
-     * Get Seller ID from Header
+     * Get Seller ID from Header or use the authenticated user ID
      */
     private function getSellerIdFromHeader()
     {
-        return (int) $this->header('sellerId');
+        $sellerId = $this->header('sellerId') ?? auth()->user()->id;
+        // Try to get the sellerId from the request header, if not found fallback to authenticated user ID
+        return (int) $sellerId;
     }
 
     /**
-     * Get Seller Type ID from Users Table
+     * Get Seller Type ID from Users Table based on the seller ID
      */
     private function getSellerTypeId()
     {
+        // Fetch the seller type ID for the seller
         return User::where('id', $this->getSellerIdFromHeader())->value('seller_type_id');
     }
 }

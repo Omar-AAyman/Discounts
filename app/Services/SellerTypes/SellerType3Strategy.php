@@ -10,20 +10,14 @@ class SellerType3Strategy implements SellerTypeStrategy
 {
     public function handle(Request $request, Store $store)
     {
-        // Apply store-wide dsscount
-        Store::where('id', $store->id)->update([
-            'discount_percentage' => $request->discount_percentage,
-        ]);
-
-        // Exclude specific items from discount and create if they don't exist
-        foreach ($request->excluded_products as $excludedProduct) {
-            Product::Create([
+        foreach ($request->products as $product) {
+            Product::create([
                 'store_id' => $store->id,
-                'name' => $excludedProduct['name'], // Search condition (name)
-                'price' => $excludedProduct['discount_amount'] ?? null,
-                'discount_percentage' => $excludedProduct['discount_percentage'] ?? null,
-                'discount_amount' => $excludedProduct['discount_amount'] ?? null,
-                'is_excluded_from_discount' => true // Fields to set if creating
+                'name' => $product['name'],
+                'price' => $product['price_before_discount'],
+                'discount_percentage' => $product['discount_percentage'] ?? null,
+                'discount_amount' => $product['discount_amount'] ?? null,
+                'is_online' => true,
             ]);
         }
 

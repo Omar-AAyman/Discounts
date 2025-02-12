@@ -16,7 +16,8 @@ class IsDelegate
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->type='delegate') {
+
+        if (Auth::check() && Auth::user()->type == 'delegate') {
             return $next($request);
         }
 
