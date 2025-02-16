@@ -1,0 +1,29 @@
+name: 🚀 FTP Auto Deploy
+
+on:
+  push:
+    branches:
+      - develop # Change to your deployment branch
+
+jobs:
+  deploy:
+    name: 📂 Upload Files via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛒 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📂 Deploy to FTP Server
+        uses: SamKirkland/FTP-Deploy-Action@v4
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: ${{ secrets.FTP_UPLOAD_PATH }}
+          exclude: |
+            **/.git*
+            **/.github*
+            **/node_modules*
+            **/vendor*
