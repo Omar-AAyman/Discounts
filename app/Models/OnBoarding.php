@@ -24,4 +24,33 @@ class OnBoarding extends Model
         'textbutton',
         'order',
     ];
+
+    /**
+     * Get the image URL for the onboarding image.
+     *
+     * @param string $value
+     * @return string|null
+     */
+    public function getImageUrlAttribute($value)
+    {
+        return $this->getImagePath($value, 'onBoardingImages');
+    }
+
+    /**
+     * Helper method to get the image path with folder prefix
+     *
+     * @param string $imageName
+     * @param string $folder
+     * @return string
+     */
+    private function getImagePath($imageName, $folder)
+    {
+        // Check if image exists, then return the path
+        if ($imageName) {
+            // Adjust the path to work with public_html and the images folder
+            return url("images/{$folder}/{$imageName}");
+        }
+
+        return null;
+    }
 }

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Wallet Deals</title>
+    <link rel="icon" href="{{ asset('assets/hero.png') }}" type="image/x-icon">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --pinkColor: #e91e63;
+            --blueColor: #2196f3;
+            --purpleColor: #9c27b0;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4d4d4d;
+            --background: #f8f9fa;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 10% 20%, rgba(233, 30, 99, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(33, 150, 243, 0.1) 0%, transparent 20%),
+                var(--background);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+        }
+
+        .payment-success-container {
+            max-width: 700px;
+            width: 100%;
+            perspective: 1000px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            transform-style: preserve-3d;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) rotateX(2deg);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--pinkColor), var(--blueColor));
+            height: 12px;
+            border-radius: 24px 24px 0 0 !important;
+        }
+
+        .status-title {
+            color: var(--text-primary);
+            font-weight: 800;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--pinkColor) 30%, var(--purpleColor) 70%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-message {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 80%;
+            margin: 0 auto 2rem;
+        }
+
+        .footer {
+            background: white;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 2rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .footer-logo {
+            max-width: 120px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+
+        .footer-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="payment-success-container">
+            <div class="card">
+                <div class="card-header"></div>
+                <div class="card-body text-center p-5">
+                    <div class="success-image-container">
+                        <i class="fas fa-check-circle" style="font-size: 6rem; color: var(--pinkColor);"></i>
+                    </div>
+                    <h1 class="status-title">Payment Successful!</h1>
+                    <p class="status-message">Your payment has been processed successfully. You can now use the app!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <a href="https://walldeals.online/" target="_blank">
+                <img src="{{ asset('assets/hero.png') }}" alt="Wallet Deals Logo" class="footer-logo">
+            </a>
+            <p class="footer-text mb-0">Wallet Deals - Your Ultimate Savings Companion.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</body>
+</html>

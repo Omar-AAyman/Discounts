@@ -54,6 +54,53 @@ class Store extends Model
         'city',
         'country',
     ];
+    protected $appends = [
+        'country_name',
+        'country_name_ar',
+        'city_name',
+        'city_name_ar',
+    ];
+
+    protected $hidden = [
+        'countryRelation',
+        'cityRelation',
+    ];
+
+    public function countryRelation()
+    {
+        return $this->belongsTo(Country::class, 'country'); // 'country' is the FK column in stores
+    }
+
+    public function getCountryAttribute()
+    {
+        return $this->attributes['country'];
+    }
+    public function getCountryNameAttribute()
+    {
+        return $this->countryRelation ? $this->countryRelation->name : null;
+    }
+    public function getCountryNameArAttribute()
+    {
+        return $this->countryRelation ? $this->countryRelation->name_ar : null;
+    }
+
+    public function getCityAttribute()
+    {
+        return $this->attributes['city'];
+    }
+    public function cityRelation()
+    {
+        return $this->belongsTo(City::class, 'city'); // 'city' is the FK column in stores
+    }
+    public function getCityNameAttribute()
+    {
+        return $this->cityRelation ? $this->cityRelation->name : null;
+    }
+    public function getCityNameArAttribute()
+    {
+        return $this->cityRelation ? $this->cityRelation->name_ar : null;
+    }
+
 
 
     public function user()
@@ -83,7 +130,17 @@ class Store extends Model
 
     public function products()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Product::class)->where('is_excluded_from_discount', 0);
+    }
+
+    public function excludedProducts()
+    {
+        return $this->hasMany(Product::class)->where('is_excluded_from_discount', 1);
+    }
+
+    public function discountRequests()
+    {
+        return $this->morphMany(DiscountRequest::class, 'discountable');
     }
 
     // Add custom accessors to modify how images are accessed
@@ -97,7 +154,7 @@ class Store extends Model
         return $this->getImagePath($value, 'storeImages');
     }
 
-    public function getSectoreQrAttribute($value)
+    public function getSectorQrAttribute($value)
     {
         return $this->getImagePath($value, 'qrcodes');
     }

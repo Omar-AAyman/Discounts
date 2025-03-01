@@ -1,10 +1,11 @@
 @extends('layout')
+@section('title', 'User Subscriptions')
 
 @section('content')
 
 
     <main>
-   
+
 
         <!-- Main page content-->
         <div class="container mt-n5">
@@ -45,7 +46,7 @@
                                     <option value="{{$user->id}}">{{$user->first_name}} {{$user->last_name}}</option>
                                     @endforeach
                                 </select>
-                                
+
                         </div>
 
                         <div class="col-md-6">
@@ -56,17 +57,17 @@
                                     <option value="{{$package->id}}">{{$package->name}}</option>
                                     @endforeach
                                 </select>
-                                
+
                         </div></div>
-                   
+
                         <div class="row gx-3 mb-3">
                              <div class="col-md-6">
                                <label class="small mb-1" for="period_in_months">Period in months </label>
                                <input type="number" name="period_in_months" id="period_in_months" class="form-control" value="{{old('period_in_months')}}" required/>
-                
+
                              </div>
 
-                       
+
                         <div class="col-md-6" style="margin-top: 35px;">
                         <button type="submit" class="btn btn-primary btn-sm">Submit</button>
                     </div></div>

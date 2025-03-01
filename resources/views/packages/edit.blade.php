@@ -1,10 +1,11 @@
 @extends('layout')
+@section('title', 'Edit Package')
 
 @section('content')
 
 
     <main>
-   
+
 
         <!-- Main page content-->
         <div class="container mt-n5">
@@ -34,7 +35,7 @@
 
                         <div class="col-md-6">
                         <label class="small mb-1" for="name">Name </label>
-                        <input type="text" name="name" id="name" class="form-control" value="{{$package->name}}" required/>
+                        <input type="text" name="" id="name" class="form-control" value="{{$package->name}}" disabled/>
                         @error('name')
                                 {{$message}}
                         @enderror
@@ -49,7 +50,7 @@
                         </div>
                         </div>
 
-                  
+
 
 
                         <div class="row gx-3 mb-3" style="margin-top: 40px;">

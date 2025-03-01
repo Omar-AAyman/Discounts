@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'Edit Package')
 
 @section('content')
 
@@ -14,7 +15,7 @@
 
                     <div class="card">
                     <div class="card-header">{{$package->name}}'s sections list
-                   
+
                     </div>
                         @if (session('success'))
 
@@ -29,9 +30,9 @@
 
                         @if (count($sections)==0)
                         <div class="card-body">
-                         
+
                             <h4>No sections in this package</h4>
-                         </div>     
+                         </div>
                          @else
                          <div class="card-body">
                                 <table id="myTable" class="table small-table-text">
@@ -40,13 +41,13 @@
 
                                         <th>Name</th>
                                         <th>Type</th>
-                                       
-                                       
-                                        
+
+
+
                                         <th>Is Online</th>
                                         <th>Actions</th>
                                         <th></th>
-                                        
+
 
                                     </tr>
                                     </thead>
@@ -56,29 +57,29 @@
 
                                             <td class=" text-black"><b>{{ $section->name }}</b></td>
                                             <td>{{$section->type}}</td>
-                                           
-               
+
+
 
                                             <td>
                                                 <span class="badge {{ $section->is_online ? 'badge-green' : 'badge-red' }}">
                                                     {{ $section->is_online ? 'Online' : 'Offline' }}
                                                     </span>
-                 
+
                                             </td>
-                                            
+
                                             <td>
-                                            <a class="btn btn-primary btn-sm" href="{{route('sections.edit' , ['uuid'=>$section['uuid'] ])}}" >   
+                                            <a class="btn btn-primary btn-sm" href="{{route('sections.edit' , ['uuid'=>$section['uuid'] ])}}" >
                                             Edit
                                               </a>
-                                        
 
-                                        
-                                        
+
+
+
                                         </td>
                                         <td>
-                                        <a class="btn btn-success btn-sm" href="{{route('sections.showStores' , ['uuid'=>$section['uuid'] ])}}" >   
-                                            Show stores 
-                                              </a> 
+                                        <a class="btn btn-success btn-sm" href="{{route('sections.showStores' , ['uuid'=>$section['uuid'] ])}}" >
+                                            Show stores
+                                              </a>
                                         </td>
 
                                         </tr>
@@ -89,11 +90,11 @@
                             </div>
                         @endif
 
-                       
+
                     </div>
                 </div>
 
-        
+
     </main>
 
 

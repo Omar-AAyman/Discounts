@@ -1,10 +1,11 @@
 @extends('layout')
+@section('title', 'New Package')
 
 @section('content')
 
 
     <main>
-   
+
 
         <!-- Main page content-->
         <div class="container mt-n5">
@@ -48,7 +49,7 @@
                         </div>
                         </div>
 
-                  
+
 
 
                         <div class="row gx-3 mb-3">

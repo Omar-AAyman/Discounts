@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Invoice extends Model
 {
     use HasFactory;
-    public $fillable = ['user_id','amount','status','subscription_id',
+    public $fillable = ['user_id','amount','amount_after_discount','status','store_id','subscription_id',
     'type' , 'product_id','quantity'];
 
     public function user(){
@@ -19,6 +19,9 @@ class Invoice extends Model
         return $this->belongsTo(Subscription::class);
     }
 
+    public function store(){
+        return $this->belongsTo(Store::class);
+    }
 
     public function product(){
         return $this->belongsTo(Product::class);

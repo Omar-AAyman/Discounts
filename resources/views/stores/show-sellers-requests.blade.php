@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'Pending Stores')
 
 @section('content')
 
@@ -14,7 +15,7 @@
 
                     <div class="card">
                     <div class="card-header">Pending Adding Sellers Requests
-                   
+
                     </div>
                         @if (session('success'))
 
@@ -29,12 +30,12 @@
 
                         @if ($stores->isEmpty())
                         <div class="card-body">
-                         
+
                             <h4>No requests yet</h4>
-                         </div>     
+                         </div>
                          @else
                          <div class="card-body">
-                                <table id="myTable" class="table small-table-text">
+                                <table id="myTable" class="table small-table-text text-center">
                                     <thead>
                                     <tr style="white-space: nowrap; font-size: 14px;">
 
@@ -42,10 +43,11 @@
                                         <th>Seller Name</th>
                                         <th>Store</th>
                                         <th>Section</th>
+                                        <th>Created At</th>
                                         <th></th>
-                                        
-                                       
-                                        
+
+
+
 
                                     </tr>
                                     </thead>
@@ -60,19 +62,17 @@
                                             <td class=" text-black"><b>{{$store->seller_name}}</b></td>
                                             <td>{{$store->name}}</td>
                                             <td>{{$store->section->name}}</td>
-               
-
-                                            
+                                            <td>{{ \Carbon\Carbon::parse($store->created_at)->format('d-m-Y')}}</td>
                                             <td>
                                             <form method="get" action="{{route('stores.approveSeller')}}">
-                                                @csrf 
+                                                @csrf
                                                 <input type="hidden" name="store_id" value="{{$store->id}}"/>
                                                 <button type="submit" class="btn btn-success btn-sm">Approve</button>
                                             </form>
-                                        
 
-                                        
-                                        
+
+
+
                                         </td>
 
                                         </tr>
@@ -83,11 +83,11 @@
                             </div>
                         @endif
 
-                       
+
                     </div>
                 </div>
 
-        
+
     </main>
 
 

@@ -25,24 +25,23 @@ class PackageController extends Controller
 
     public function validateData(Request $request){
         $data = $request->validate([
-            'name'=>'required',
             'description'=>'required',
 
         ]);
 
-        
+
 
         return $data ;
     }
 
-    public function store(Request $request){
+    // public function store(Request $request){
 
-        $data = $this->validateData($request);
-        Package::create($data);
+    //     $data = $this->validateData($request);
+    //     Package::create($data);
 
-        return redirect()->route('packages.index')->with('success','package was created successfully');
+    //     return redirect()->route('packages.index')->with('success','package was created successfully');
 
-    }
+    // }
 
     public function edit($uuid){
         $package = Package::where('uuid',$uuid)->first();
@@ -51,7 +50,7 @@ class PackageController extends Controller
 
     public function update(Request $request , $uuid){
         $package = Package::where('uuid',$uuid)->first();
-        
+
         $data = $this->validateData($request);
 
         $is_online = ['is_online'=>$request->has('is_online')?1:0];

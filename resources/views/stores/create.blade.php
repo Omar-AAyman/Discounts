@@ -1,10 +1,11 @@
 @extends('layout')
+@section('title', 'New Store')
 
 @section('content')
 
 
     <main>
-   
+
 
         <!-- Main page content-->
         <div class="container mt-n5">
@@ -47,7 +48,7 @@
                                     <option value="{{$user->id}}">{{$user->first_name}} {{$user->last_name}}</option>
                                     @endforeach
                                 </select>
-                                
+
                         </div>
                     </div>
                 <div class="row gx-3 mb-3">
@@ -59,7 +60,7 @@
                                     <option value="{{$section->id}}">{{$section->name}}</option>
                                     @endforeach
                                 </select>
-                                
+
                 </div>
                         <div class="col-md-6">
                         <label class="small mb-1" for="description">Description </label>
@@ -70,7 +71,7 @@
                         </div>
                         </div>
 
-                  
+
 
 
                         <div class="row gx-3 mb-3">

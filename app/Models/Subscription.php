@@ -10,13 +10,28 @@ class Subscription extends Model
     use HasFactory;
 
     protected $table = 'subscriptions';
-    protected $fillable = ['user_id','package_id','is_online','status','type','period_in_months'];
+    protected $fillable = [
+        'user_id',
+        'package_id',
+        'is_online',
+        'type',
+        'period_in_months',
+        'status',
+        'expires_at',
+        'transaction_id'
+    ];
 
-    public function package(){
+    public function package()
+    {
         return $this->belongsTo(Package::class);
     }
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
+    }
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
     }
 }

@@ -1,4 +1,6 @@
 @extends('layout')
+@section('title', 'OnBoarding Slides')
+
 @section('content')
 
 <main>

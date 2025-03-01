@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'All Offers')
 @section('content')
 
 <main>
@@ -26,7 +27,6 @@
                                     <th>Store</th>
                                     <th>Discount (%)</th>
                                     <th>Price Before Discount</th>
-                                    <th>Image</th>
                                     <th>Background Image</th>
                                     <th>Is Online</th>
                                     <th>Actions</th>
@@ -40,15 +40,8 @@
                                         <td>{{ $offer->discount_percentage ?? 'N/A' }}</td>
                                         <td>{{ $offer->price_before_discount ?? 'N/A' }}</td>
                                         <td>
-                                            @if (isset($offer->img))
-                                                <img src="{{ asset('offerImages/' . $offer->img) }}" alt="Image" width="100" height="100">
-                                            @else
-                                                <img src="{{ asset('assets/img/noimg.jpg') }}" alt="No Image" width="100" height="100">
-                                            @endif
-                                        </td>
-                                        <td>
                                             @if (isset($offer->bg_img))
-                                                <img src="{{ asset('offerImages/' . $offer->bg_img) }}" alt="Background Image" width="100" height="100">
+                                                <img src="{{$offer->bg_img }}" alt="Background Image" width="100" height="100">
                                             @else
                                                 <img src="{{ asset('assets/img/noimg.jpg') }}" alt="No Background Image" width="100" height="100">
                                             @endif
@@ -59,7 +52,9 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('offers.edit', $offer->id) }}" class="btn btn-primary btn-xs">Edit</a>
+                                            <a href="{{ route('offers.edit', $offer->id) }}" class="btn btn-primary btn">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
                                         </td>
                                     </tr>
                                 @endforeach

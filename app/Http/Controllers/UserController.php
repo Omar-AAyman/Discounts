@@ -19,10 +19,17 @@ class UserController extends Controller
         where('type','seller')
         ->orderBy('created_at','desc')
         ->get();
-    
+
         return view('users.sellers',compact('users'));
     }
+    public function customerSupport(){
+        $users = User::
+        where('type','customer_support')
+        ->orderBy('created_at','desc')
+        ->get();
 
+        return view('users.customer_supports',compact('users'));
+    }
     public function delegates(){
         $users = User::
         where('type','delegate')
@@ -63,7 +70,8 @@ class UserController extends Controller
 
     public function store(Request $request){
         $data = $this->validateData($request);
-       $user = User::create($data);
+        $data['password'] = bcrypt($data['password']);
+        $user = User::create($data);
         return redirect()->route('users.'.$user->type.'s')->with('success','user was created successfully');
     }
 
@@ -101,14 +109,14 @@ class UserController extends Controller
         ]);
         $data['is_online'] =  $request->has('is_online')? 1:0;
         $user->update($data);
-        return redirect()->route('users.'.$user->type.'s')->with('success','user was updated successfully');
+        return redirect()->route('users.'.$user->type.'s')->with('success',$user->type. ' was updated successfully');
 
     }
 
 
 
     public function makeSponser(Request $request){
-     
+
 
         $user = User::findOrFail($request->user_id);
         $user->is_sponser = 1 ;

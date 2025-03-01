@@ -137,15 +137,22 @@ class DelegateControllerApi extends Controller
 
         try {
             // Update Seller (User)
-            $seller->update([
+            $updateData =[
                 'first_name' => $request->first_name ?? $seller->first_name,
                 'last_name' => $request->last_name ?? $seller->last_name,
                 'email' => $request->email ?? $seller->email,
                 'phone' => $request->phone ?? $seller->phone,
                 'phone2' => $request->whatsapp_number ?? $seller->phone2,
+                'password' => Hash::make($request->password),
                 'city' => $request->branches[0]['city'] ?? $seller->city,
                 'country' => $request->branches[0]['country'] ?? $seller->country,
-            ]);
+            ];
+            // Only update the password if it is present in the request
+            if ($request->filled('password')) {
+                $updateData['password'] = Hash::make($request->password);
+            }
+
+            $seller->update($updateData);
 
             // Update Store
             $store->update([
@@ -171,19 +178,35 @@ class DelegateControllerApi extends Controller
             // Handle image uploads if new images are provided
             $this->handleImageUploads($request, $store);
 
-            // Handle store branches (update or add new)
+            // Handle store branches (add new and then remove old)
             if (!empty($request->branches)) {
+                $newBranchIds = []; // Array to hold new branch IDs
                 foreach ($request->branches as $branch) {
-                    StoreBranch::updateOrCreate(
-                        ['store_id' => $store->id, 'city' => $branch['city'], 'country' => $branch['country']],
-                        ['status' => true] // Active by default
-                    );
+                    if (isset($branch['id'])) {
+                        // Update existing branch if an ID is provided
+                        $existingBranch = StoreBranch::find($branch['id']);
+                        if ($existingBranch) {
+                            $existingBranch->city = $branch['city'] ?? $existingBranch->city;
+                            $existingBranch->country = $branch['country'] ?? $existingBranch->country;
+                            $existingBranch->save();
+                            $newBranchIds[] = $existingBranch->id; // Add to new branch IDs
+                        }
+                    } else {
+                        // Create a new branch if no ID is provided
+                        $newBranch = StoreBranch::create([
+                            'store_id' => $store->id,
+                            'city' => $branch['city'],
+                            'country' => $branch['country'],
+                            'status' => true // Active by default
+                        ]);
+                        $newBranchIds[] = $newBranch->id; // Add to new branch IDs
+                    }
                 }
-            }
 
-            // Handle branch deletions
-            if (!empty($request->deleted_branches_ids) && is_array($request->deleted_branches_ids)) {
-                StoreBranch::whereIn('id', $request->deleted_branches_ids)->where('store_id', $store->id)->delete();
+                // Remove old branches that are not in the new list
+                StoreBranch::where('store_id', $store->id)
+                    ->whereNotIn('id', $newBranchIds)
+                    ->delete(); // Remove old branches
             }
 
             // Apply seller-specific logic using Strategy Pattern
@@ -269,6 +292,7 @@ class DelegateControllerApi extends Controller
                 'city' => $request->branches[0]['city'] ?? null,
                 'country' => $request->branches[0]['country'] ?? null,
             ]);
+            $workDays = array_map('strtolower', $request->work_days);
 
             // 2️⃣ Create the Store
             $store = Store::create([
@@ -277,9 +301,7 @@ class DelegateControllerApi extends Controller
                 'section_id' => $request->section_id,
                 'description' => $request->store_description,
                 'discount_percentage' => $request->discount_percentage,
-                'password' => Hash::make($request->password),
                 'seller_name' => $request->first_name,
-                'section_id' => $request->section_id,
                 'city' => $request->branches[0]['city'] ?? null,
                 'country' => $request->branches[0]['country'] ?? null,
                 'delegate_id' => auth()->user()->id,
@@ -289,7 +311,7 @@ class DelegateControllerApi extends Controller
                 'phone_number2' => $request->whatsapp_number,
                 'email' => $request->email,
                 'work_hours' => $request->work_hours,
-                'work_days' => json_encode($request->work_days),
+                'work_days' => json_encode($workDays),
                 'status' => "pending",
                 'facebook' => $request->facebook ?? null,
                 'instagram' => $request->instagram ?? null,
@@ -334,7 +356,7 @@ class DelegateControllerApi extends Controller
                 $seller->delete();
             }
             // Log the error for debugging purposes (optional)
-            Log::error('Error updating seller: ' . $e->getMessage());
+            dd('Error updating seller: ' . $e->getMessage());
 
             // Return an error response
             return response()->json([
@@ -344,38 +366,7 @@ class DelegateControllerApi extends Controller
         }
     }
 
-    /**
-     * Endpoint to delete a seller and their associated store.
-     * This method handles the deletion of a seller and their store based on the seller ID passed.
-     * If the seller or store is not found, it returns a 404 error.
-     *
-     * @param int $sellerId
-     * @return JsonResponse
-     */
-    public function destroy(int $sellerId): JsonResponse
-    {
-        // Find the seller and store by sellerId
-        $seller = User::find($sellerId);
-        $store = Store::where('user_id', $sellerId)->first();
 
-        // Check if seller and store exist
-        if (!$seller || !$store) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Seller or store not found.',
-            ], 200); // 404: Not Found
-        }
-
-        // Delete the seller and the store
-        $seller->delete();
-        $store->delete();
-
-        // Return success response
-        return response()->json([
-            'status' => true,
-            'message' => 'Seller and store deleted successfully',
-        ]);
-    }
 
 
     /**
@@ -439,36 +430,102 @@ class DelegateControllerApi extends Controller
      */
     private function generateStoreQrCode(Store $store): void
     {
-        // Generate a unique hashed filename for the QR code
-        $hashedFileName = hash('sha256', time() . Str::random(10)) . '.svg';
+        // Ensure the store has a UUID
+        if (!$store->uuid) {
+            $store->uuid = Str::uuid();
+            $store->save();
+        }
 
-        // Convert hex color to RGB
-        $red = 192;  // C0 in hex
-        $green = 26; // 1A in hex
-        $blue = 134; // 86 in hex
+        // Convert hex color to RGB (C01A86)
+        $color = sscanf('#C01A86', "#%02x%02x%02x");
+        [$red, $green, $blue] = $color;
+
+        // Generate QR content with UUID-based URL
+        $qrContent = $store->uuid;
 
         // Generate the QR code with custom color
         $qrCode = QrCode::format('svg')
-            ->size(300) // Set the size of the QR code image
-            ->color($red, $green, $blue) // Apply custom color
-            ->generate(route('store.discount', ['store' => $store->id])); // QR content
+            ->size(300)
+            ->color((int)$red, (int)$green, (int)$blue)
+            ->generate($qrContent);
 
-        // Define the folder path
-        $destinationPath = public_path('images/qrcodes');
+        // Define paths
+        $directory = public_path('images/qrcodes');
+        $filename = "store_{$store->uuid}.svg";
+        $fullPath = "$directory/$filename";
 
-        // Ensure the directory exists
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0777, true);
+        // Ensure directory exists
+        if (!File::exists($directory)) {
+            File::makeDirectory($directory, 0755, true);
         }
 
-        // Define the full path to save the QR code image
-        $qrCodePath = $destinationPath . '/' . $hashedFileName;
+        // Save QR code
+        File::put($fullPath, $qrCode);
 
-        // Save the QR code image to the specified path
-        File::put($qrCodePath, $qrCode);
 
         // Save only the relative path in the database
-        $store->sector_qr = $hashedFileName;
+        $store->sector_qr = $filename;
         $store->save(); // Save the store with the QR code path
+    }
+
+
+    /**
+     * Request to delete a store by updating its status to delete_requested.
+     */
+    public function requestStoreDeletion($storeId)
+    {
+        $store = Store::where('id', $storeId)
+            ->where('delegate_id', auth()->id())
+            ->firstOrFail();
+
+        if ($store->status === 'delete_requested') {
+            return back()->with('info', 'Deletion request already submitted.');
+        }
+
+        $store->status = 'delete_requested';
+        $store->save();
+
+        return back()->with('success', 'Store deletion request submitted successfully.');
+    }
+
+
+    /**
+     * Endpoint to delete a seller and their associated store.
+     * This method handles the deletion of a seller and their store based on the seller ID passed.
+     * If the seller or store is not found, it returns a 404 error.
+     *
+     * @param int $sellerId
+     * @return JsonResponse
+     */
+    public function destroy(int $sellerId): JsonResponse
+    {
+        // Find the seller and store by sellerId
+        $seller = User::find($sellerId);
+        $store = Store::where('user_id', $sellerId)
+            ->where('delegate_id', auth()->id())
+            ->firstOrFail();
+
+        // Check if seller and store exist
+        if (!$seller || !$store) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Seller or store not found.',
+            ], 200); // 404: Not Found
+        }
+        if ($store->status === 'delete_requested') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Deletion request already submitted.',
+            ]);
+        }
+
+        $store->status = 'delete_requested';
+        $store->save();
+
+        // Return success response
+        return response()->json([
+            'status' => true,
+            'message' => 'Store deletion request submitted successfully.',
+        ]);
     }
 }

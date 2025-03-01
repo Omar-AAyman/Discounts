@@ -1,11 +1,13 @@
 @extends('layout')
+@section('title', 'All News')
+
 @section('content')
 
 <main>
         <!-- Main page content-->
         <div class="container mt-n5">
 
-           
+
 
 
                     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
@@ -21,19 +23,19 @@
                             @if (session('success'))
                             <div class="alert alert-success">{{ session('success') }}</div>
                             @endif
-                            
+
                                 <table id="myTable" class="table small-table-text">
                                     <thead>
                                     <tr style="white-space: nowrap; font-size: 14px;">
-                                        
+
                                         <th>Title</th>
                                         <th>Description</th>
                                         <th>Picture</th>
 
                                         <th>Is Online</th>
-                                       
+
                                         <th>Actions</th>
-                                        
+
 
 
 
@@ -46,36 +48,36 @@
                                             <td>{{$new->title}}</td>
 
                                             <td>
-                                              @if($new->description)  
+                                              @if($new->description)
                                                 @php
                                                 $value = $new->description;
                                                 $first5Words = mb_strimwidth($value, 0, 50, '...');
                                                 @endphp
 
                                                 {{ $first5Words }}
-                                               @else 
-                                               No Description 
-                                               @endif 
+                                               @else
+                                               No Description
+                                               @endif
                                             </td>
 
                                             <td>
                                                     @if(isset($new->img))
-                                                    <img src="{{ asset('newsImages/'.$new->img) }}" alt=" Picture" width="100" height="100">
+                                                    <img src="{{ $new->img }}" alt="Picture" width="100" height="100">
                                                     @else
                                                     <img src="{{ asset('assets/img/noimg.jpg') }}" alt="Product Picture" width="100" height="100">
-                                                    @endif 
+                                                    @endif
                                             </td>
-                                            
+
 
                                             <td>
                                                 <span class="badge {{ $new->is_online ? 'badge-green' : 'badge-red' }}">
                                                     {{ $new->is_online ? 'Online' : 'Offline' }}
                                                     </span>
-                 
+
                                             </td>
-        
-                                          
-                                            
+
+
+
                                             <td>
                                                 <a href="{{route('news.edit',$new->uuid)}}" class="btn btn-primary btn-xs">Edit</a>
 
@@ -90,8 +92,8 @@
 
                             </div>
                         @endif
-                            
-                     
+
+
                     </div>
                 </div>
         </div>

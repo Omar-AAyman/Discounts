@@ -4,17 +4,14 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Country;
-use Illuminate\Http\Request;
 
 class CountriesApi extends Controller
 {
-
-
-
-    public function countries(){
-        $countries = Country::all();
+    public function cities(){
+        $countries = Country::select('id','name','name_ar')->get();
         return response([
-            'countries'=>$countries->pluck('name'),
-        ]);
+            'status'=> true ,
+            'data'=> $countries
+        ],200);
     }
 }

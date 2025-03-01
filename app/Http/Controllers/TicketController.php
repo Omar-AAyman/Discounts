@@ -7,15 +7,15 @@ use Illuminate\Http\Request;
 
 class TicketController extends Controller
 {
-        public function __construct()
+    public function __construct()
     {
         $this->middleware('auth');
     }
 
-    public function index(){
-        $tickets = Ticket::where('parent_id',null)->orderBy('created_at','desc')->get();
-        return view('tickets.index',compact('tickets'));
-
+    public function index()
+    {
+        $tickets = Ticket::where('parent_id', null)->orderBy('created_at', 'desc')->get();
+        return view('tickets.index', compact('tickets'));
     }
 
     public function show($id)
@@ -42,5 +42,16 @@ class TicketController extends Controller
 
         // Redirect back to the ticket with a success message
         return redirect()->route('tickets.show', $parentTicketId)->with('success', 'Reply submitted successfully');
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate(['status' => 'required|in:open,in_progress,closed']);
+
+        $ticket = Ticket::findOrFail($id);
+        $ticket->status = $request->status;
+        $ticket->save();
+
+        return back()->with('success', 'Ticket status updated successfully.');
     }
 }

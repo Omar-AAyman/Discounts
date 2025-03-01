@@ -1,4 +1,6 @@
 @extends('layout')
+@section('title', 'Edit Image')
+
 @section('content')
 
 <main>
@@ -10,7 +12,7 @@
                                 <div class="alert alert-danger">
                                     {{ $errors->first('fail') }}
                                 </div>
-                            @endif 
+                            @endif
 
 
                   <div class="row m-5">
@@ -20,7 +22,7 @@
                                     <div class="card-header">{{$option->key}}</div>
                                     <div class="card-body text-center">
                                         <!-- Profile picture image-->
-                                        <img id="product-image" width="160" height="160" class="img-account-profile  mb-1" src="{{ isset($option->img)? asset('optionImages/'.$option->img): '/assets/img/noimg.jpg' }}" alt="main pic" />
+                                        <img id="product-image" width="160" height="160" class="img-account-profile  mb-1" src="{{ isset($option->img)? $option->img : '/assets/img/noimg.jpg' }}" alt="main pic" />
                                         <!-- Profile picture help block-->
                                         <!-- Profile picture upload button-->
                                         <form  method="POST" action="{{ route('options.updateImageOption', $option->id ) }}" enctype="multipart/form-data" id="image-form">
@@ -38,20 +40,20 @@
                                 <div class="card mb-4">
                                     <div class="card-header">Image Option</div>
                                     <div class="card-body">
-                                       
+
                                         <!-- Form Row-->
-                                           
+
                                             <div class="row gx-3 mb-3">
-                                               
+
                                                 <div class="col-12">
-                                                   
+
                                                     <input class="form-control"  type="text"  value="{{ $option->key }}" readonly />
-                                                  
+
                                                 </div>
-                                                
-                                                
+
+
                                             </div>
-                                           
+
                                             <div class="row gx-3 mb-3">
                                             <div class="col-12">
                                             <button class="btn btn-primary" type="submit">Save changes</button></div></div>
@@ -75,4 +77,4 @@
         // Submit form after selecting image
     }
 </script>
-@endsection                       
+@endsection

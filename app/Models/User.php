@@ -60,12 +60,26 @@ class User extends Authenticatable
 
     public function getImgAttribute($value)
     {
-
-        if ($value) {
-            return asset('userImages/' . $value);
-        }
-        return asset('userImages/userr.png'); // Provide a default image if none is set
+        return $this->getImagePath($value, 'userImages');
     }
+
+    /**
+     * Helper method to get the image path with folder prefix
+     *
+     * @param string $imageName
+     * @param string $folder
+     * @return string
+     */
+    private function getImagePath($imageName, $folder)
+    {
+        // Check if image exists, then return the full URL
+        if ($imageName) {
+            return url("images/{$folder}/{$imageName}");
+        }
+
+        return url("images/{$folder}/userr.png"); // Provide a default image if none is set
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -74,6 +88,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'cityRelation',
+        'countryRelation'
     ];
 
     /**
@@ -86,11 +102,59 @@ class User extends Authenticatable
     ];
 
 
+    protected $appends = [
+        'fullname',
+        'country_name',
+        'country_name_ar',
+        'city_name',
+        'city_name_ar',
+    ];
+
+    
+    public function countryRelation()
+    {
+        return $this->belongsTo(Country::class, 'country'); // 'country' is the FK column in stores
+    }
+
+    public function getCountryAttribute()
+    {
+        return $this->attributes['country'];
+    }
+    public function getCountryNameAttribute()
+    {
+        return $this->countryRelation ? $this->countryRelation->name : null;
+    }
+    public function getCountryNameArAttribute()
+    {
+        return $this->countryRelation ? $this->countryRelation->name_ar : null;
+    }
+
+    public function getCityAttribute()
+    {
+        return $this->attributes['city'];
+    }
+    public function cityRelation()
+    {
+        return $this->belongsTo(City::class, 'city'); // 'city' is the FK column in stores
+    }
+    public function getCityNameAttribute()
+    {
+        return $this->cityRelation ? $this->cityRelation->name : null;
+    }
+    public function getCityNameArAttribute()
+    {
+        return $this->cityRelation ? $this->cityRelation->name_ar : null;
+    }
+
+
     public function stores()
     {
         return $this->hasMany(Store::class);
     }
-
+    public function store()
+    {
+        return $this->hasOne(Store::class, 'user_id', 'id');
+    }
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);
@@ -107,7 +171,7 @@ class User extends Authenticatable
     }
     public function sellerType()
     {
-        return $this->hasOne(SellerType::class, 'id','seller_type_id');
+        return $this->hasOne(SellerType::class, 'id', 'seller_type_id');
     }
 
     public function tickets()
@@ -123,5 +187,18 @@ class User extends Authenticatable
     public function favorites()
     {
         return $this->hasMany(Favorite::class);
+    }
+    public function getFullnameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+
+    public function lastSessionBeforeCurrent()
+    {
+        return $this->hasMany(UserActivity::class)
+            ->orderBy('last_activity', 'desc')
+            ->skip(1) // Skip the most recent session (current one)
+            ->first();
     }
 }

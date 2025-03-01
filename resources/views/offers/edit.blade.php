@@ -1,48 +1,33 @@
 @extends('layout')
+@section('title', 'Edit Offer')
 @section('content')
 <main>
     <div class="container mt-5">
         <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 
         @if ($errors->has('fail'))
-            <div class="alert alert-danger">
-                {{ $errors->first('fail') }}
-            </div>
-        @endif 
+        <div class="alert alert-danger">
+            {{ $errors->first('fail') }}
+        </div>
+        @endif
 
         <div class="row m-5">
             <div class="col-xl-4">
                 <!-- Image Card -->
-                <div class="card mb-4 mb-xl-0">
-                    <div class="card-header">Offer Image</div>
-                    <div class="card-body text-center">
-                        <!-- Display Image -->
-                        @if (isset($offer->img))
-                            <img id="offer-image" width="160" height="160" class="img-account-profile mb-1" src="{{ asset('offerImages/' . $offer->img) }}" alt="Offer Image" />
-                        @else
-                            <img id="offer-image" width="160" height="160" class="img-account-profile mb-1" src="{{ asset('assets/img/noimg.jpg') }}" alt="No Image" />
-                        @endif
-                        <!-- Upload Image -->
-                        <form method="POST" action="{{ route('offers.update', $offer->id) }}" enctype="multipart/form-data" id="image-form">
-                            @csrf
-                            @method('PUT')
-                            <label for="img" class="btn btn-primary btn-sm mt-2">
-                                Upload New Image
-                            </label>
-                            <input style="display: none;" type="file" name="img" id="img" class="form-control-file" onchange="updateImagePreview(event, 'offer-image');">
-                    </div>
-                </div>
                 <!-- Background Image Card -->
-                <div class="card mb-4 mb-xl-0 mt-4">
+                <div class="card mb-4 mb-xl-0">
                     <div class="card-header">Background Image</div>
                     <div class="card-body text-center">
                         <!-- Display Background Image -->
                         @if (isset($offer->bg_img))
-                            <img id="bg-image" width="160" height="160" class="img-account-profile mb-1" src="{{ asset('offerImages/' . $offer->bg_img) }}" alt="Background Image" />
+                        <img id="bg-image" width="160" height="160" class="img-account-profile mb-1" src="{{  $offer->bg_img }}" alt="Background Image" />
                         @else
-                            <img id="bg-image" width="160" height="160" class="img-account-profile mb-1" src="{{ asset('assets/img/noimg.jpg') }}" alt="No Background Image" />
+                        <img id="bg-image" width="160" height="160" class="img-account-profile mb-1" src="{{ asset('assets/img/noimg.jpg') }}" alt="No Background Image" />
                         @endif
                         <!-- Upload Background Image -->
+                        <form method="POST" action="{{ route('offers.update', $offer->id) }}" enctype="multipart/form-data" id="image-form">
+                        @csrf
+                        @method('PUT')
                         <label for="bg_img" class="btn btn-primary btn-sm mt-2">
                             Upload Background Image
                         </label>
@@ -85,13 +70,14 @@
 
                         <div class="row gx-3 mb-3">
                             <div class="col-12">
-                            <label for="exclusions" class="form-label">Exclusions</label>
-                            <textarea class="form-control" name="exclusions">
-                               {{ $offer->exclusions }}
-                            </textarea>
+                                <label for="exclusions" class="form-label">Exclusions</label>
+                                <textarea class="form-control" name="exclusions">
+                                {{ $offer->exclusions }}
+                                </textarea>
 
 
-                            </div></div>
+                            </div>
+                        </div>
                         <div class="row gx-3 mb-3">
                             <div class="col-12">
                                 <button class="btn btn-primary btn-sm" type="submit">Save Changes</button>
@@ -114,5 +100,6 @@
         }
         reader.readAsDataURL(event.target.files[0]);
     }
+
 </script>
 @endsection

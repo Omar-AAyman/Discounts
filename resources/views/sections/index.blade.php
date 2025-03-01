@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'All Sections')
 
 @section('content')
 
@@ -14,7 +15,7 @@
 
                     <div class="card">
                     <div class="card-header">Sections List
-                   
+
                     </div>
                         @if (session('success'))
 
@@ -29,24 +30,22 @@
 
                         @if ($sections->isEmpty())
                         <div class="card-body">
-                         
+
                             <h4>No sections</h4>
-                         </div>     
+                         </div>
                          @else
                          <div class="card-body">
-                                <table id="myTable" class="table small-table-text">
+                                <table id="myTable" class="table small-table-text text-center">
                                     <thead>
                                     <tr style="white-space: nowrap; font-size: 14px;">
 
                                         <th>Name</th>
                                         <th>Type</th>
-                                        <th>Belongs to package</th>
-                                       
-                                        
+                                        <th>Belongs to packages</th>
                                         <th>Is Online</th>
                                         <th>Actions</th>
                                         <th></th>
-                                        
+
 
                                     </tr>
                                     </thead>
@@ -56,29 +55,40 @@
 
                                             <td class=" text-black"><b>{{ $section->name }}</b></td>
                                             <td>{{$section->type}}</td>
-                                            <td>{{$section->package->name}}</td>
-               
+                                            <td>
+                                                @if ($section->packages->isNotEmpty())
+                                                    <ul>
+                                                        @foreach ($section->packages as $package)
+                                                            <li>{{ $package->name }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    No packages
+                                                @endif
+                                            </td>
+
 
                                             <td>
                                                 <span class="badge {{ $section->is_online ? 'badge-green' : 'badge-red' }}">
                                                     {{ $section->is_online ? 'Online' : 'Offline' }}
                                                     </span>
-                 
+
                                             </td>
-                                            
+
                                             <td>
-                                            <a class="btn btn-primary btn-sm" href="{{route('sections.edit' , ['uuid'=>$section['uuid'] ])}}" >   
+                                            <a class="btn btn-primary btn-sm" href="{{route('sections.edit' , ['uuid'=>$section['uuid'] ])}}" >
                                             Edit
                                               </a>
-                                        
-
-                                        
-                                        
+                                              <form action="{{ route('sections.destroy', ['uuid' => $section['uuid']]) }}" method="POST" style="display:inline;">
+                                                  @csrf
+                                                  @method('DELETE')
+                                                  <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this section?');">Delete</button>
+                                              </form>
                                         </td>
                                         <td>
-                                        <a class="btn btn-success btn-sm" href="{{route('sections.showStores' , ['uuid'=>$section['uuid'] ])}}" >   
+                                        <a class="btn btn-success btn-sm" href="{{route('sections.showStores' , ['uuid'=>$section['uuid'] ])}}" >
                                             Show stores points
-                                              </a> 
+                                              </a>
                                         </td>
 
                                         </tr>
@@ -89,11 +99,11 @@
                             </div>
                         @endif
 
-                       
+
                     </div>
                 </div>
 
-        
+
     </main>
 
 

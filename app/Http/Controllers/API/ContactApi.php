@@ -12,37 +12,64 @@ use Laravel\Sanctum\PersonalAccessToken;
 class ContactApi extends Controller
 {
 
-    public function userMessage(Request $request){
-
-
+    public function userMessage(Request $request)
+    {
         $request->validate([
-            'email'=>'required',
-            'message'=>'required',
-            
+            'email' => 'required|email',
+            'message' => 'required|string',
         ]);
-            $user = User::where('email',$request->email)->first();
 
-            if($user){
+        $user = User::where('email', $request->email)->first();
 
-                Ticket::create([
+        if (!$user) {
+            return response(['status' => false, 'message' => 'User doesn\'t exist'], 200);
+        }
 
-                    'title'=>'contact message',
-                    'user_id'=> $user->id ,
-                    'body'=>  $request->message,
-                ]);
+        // Check if the user has any open or in-progress tickets
+        $hasOpenTicket = Ticket::where('user_id', $user->id)
+            ->whereIn('status', ['open', 'in_progress'])
+            ->exists();
 
-                return response(['message'=>'message was sent to wallet deals admins']);
+        if ($hasOpenTicket) {
+            return response(['status' => false, 'message' => 'You already have an open or in-progress ticket. Please resolve it before opening a new one.'], 200);
+        }
 
-            }
+        // Create a new ticket
+        Ticket::create([
+            'title' => 'Contact Message',
+            'user_id' => $user->id,
+            'body' => $request->message,
+            'status' => 'open',
+        ]);
 
-            else{
+        return response(['status' => true, 'message' => 'Message was sent to Wallet Deals admins'], 200);
+    }
 
-                return response(['message'=>'user doesn\'t exist']);
-            }
+    /**
+     * Get a list of tickets for the authenticated user.
+     */
+    public function getUserTickets(Request $request)
+    {
+        $user = auth()->user();
 
+        $tickets = Ticket::where('user_id', $user->id)->with('responses')->get();
 
-    
+        return response(['status'=>true ,'data' => $tickets],200);
 
     }
-    
+
+    /**
+     * Show a specific ticket, but only if it belongs to the authenticated user.
+     */
+    public function showUserTicket(Request $request, $id)
+    {
+        $user = auth()->user();
+        $ticket = Ticket::where('id', $id)->where('user_id', $user->id)->with('responses')->first();
+
+        if (!$ticket) {
+            return response(['status'=>true ,'message' => 'Ticket not found or unauthorized'], 200);
+        }
+
+        return response(['status'=>true ,'data' => $ticket],200);
+    }
 }

@@ -44,6 +44,8 @@
     <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+    <title>WalletDeals | @yield('title')</title>
+    <link rel="icon" href="{{ asset('assets/hero.png') }}" type="image/x-icon">
 
 
     @yield('headers')
@@ -65,6 +67,7 @@
 
         <li class="nav-item dropdown no-caret " style="padding-top: 2px">
 
+            {{-- <a href="{{ route('payment.create') }}" class="btn btn-primary">Pay Now</a> --}}
 
         </li>
 
@@ -78,7 +81,7 @@
                      aria-labelledby="navbarDropdownDocs">
 
 
-     
+
 
                     <div class="dropdown-divider m-0"></div>
                     <a class="dropdown-item py-3" href="#" onclick="event.preventDefault();
@@ -96,7 +99,7 @@
                         @csrf
 
                     </form>
-                    
+
 
 
                 </div>
@@ -121,7 +124,9 @@
                         <div class="col-12 col-md-6 mt-4 text-right">
                             <a href="{{route('options.index')}}" class="btn btn-outline-white rounded-pill btn-sm" role="button">Panel Settings <i class="fas fa-cog ml-1"></i></a>
 
-                            <a href="#" class="btn btn-outline-white rounded-pill btn-sm ml-1" role="button">exit <i class="fas fa-arrow-left ml-1"></i></a>
+                            @if (!request()->is('admin'))
+                                <a href="/admin" class="btn btn-outline-white rounded-pill btn-sm ml-1" role="button">exit <i class="fas fa-arrow-left ml-1"></i></a>
+                            @endif
                         </div>
                     </div>
                 </div>

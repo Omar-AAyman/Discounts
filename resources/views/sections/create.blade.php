@@ -1,10 +1,11 @@
 @extends('layout')
+@section('title', 'New Section')
 
 @section('content')
 
 
     <main>
-   
+
 
         <!-- Main page content-->
         <div class="container mt-n5">
@@ -40,14 +41,16 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="small mb-1" for="name">Package</label>
-                            <select name="package_id" id="user_id" class="form-control form-control-solid" required>
-                                        <option value="" >Select a package </option>
-                                    @foreach($packages as $package)
-                                    <option value="{{$package->id}}">{{$package->name}}</option>
-                                    @endforeach
-                                </select>
-                                
+                            <label class="small mb-1" for="packages">Packages</label>
+                            <select name="package_ids[]" id="packages" class="form-control form-control-solid" multiple required>
+                                <option value="">Select packages</option>
+                                @foreach($packages as $package)
+                                    <option value="{{ $package->id }}" {{ in_array($package->id, old('package_ids', [])) ? 'selected' : '' }}>{{ $package->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('package_ids')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                 <div class="row gx-3 mb-3">
@@ -57,7 +60,7 @@
                         @error('type')
                                 {{$message}}
                         @enderror
-                                
+
                 </div>
                         <div class="col-md-6">
                         <label class="small mb-1" for="description">Description </label>
@@ -68,7 +71,7 @@
                         </div>
                         </div>
 
-                  
+
 
 
                         <div class="row gx-3 mb-3">

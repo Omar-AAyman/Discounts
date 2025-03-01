@@ -4,8 +4,6 @@
 
 
     <main>
-   
-
         <!-- Main page content-->
         <div class="container mt-n5">
 
@@ -36,14 +34,14 @@
                         <div class="col-md-6">
                         <label class="small mb-1" for="name">First Name </label>
                         <input type="text" class="form-control" value="{{$store->seller_name}}" readonly />
-                       
+
                         </div>
 
                         <div class="col-md-6">
                             <label class="small mb-1" for="name">Email</label>
                             <input type="text" class="form-control" value="{{$store->email}}" readonly />
 
-                                
+
                         </div>
                     </div>
                 <div class="row gx-3 mb-3">
@@ -51,7 +49,7 @@
                         <label class="small mb-1" for="last_name">Last Name</label>
                         <input type="text" name="last_name" id="last_name" class="form-control" value="{{old('last_name')}}" required />
 
-                                
+
                 </div>
                         <div class="col-md-6">
                         <label class="small mb-1" for="password">Password </label>
@@ -74,7 +72,7 @@
                         </div>
 
 
-                        
+
                         <div class="col-md-6" style="margin-top: 2rem;">
                         <button type="submit" class="btn btn-primary btn-sm">Create</button>
                     </div></div>

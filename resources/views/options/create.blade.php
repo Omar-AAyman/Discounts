@@ -1,10 +1,11 @@
 @extends('layout')
+@section('title', 'New Option')
 
 @section('content')
 
 
     <main>
-   
+
 
         <!-- Main page content-->
         <div class="container mt-n5">
@@ -35,7 +36,7 @@
                         <label class="small mb-1" for="key">Key</label>
                         <input id="key" type="string" name="key" class="form-control" value="{{old('key')}}" required/>
 
-                                
+
                                 @error('key')
                                 {{$message}} @enderror
                         </div>

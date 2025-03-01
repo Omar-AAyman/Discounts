@@ -1,5 +1,5 @@
 @extends('layout')
-
+@section('title', 'Edit Slide')
 @section('content')
 
 <main>
@@ -21,7 +21,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('onboardings.update', $onBoarding->id) }}" method="POST">
+                <form action="{{ route('onboardings.update', $onBoarding->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -46,11 +46,12 @@
                     </div>
 
                     <div class="row gx-3 mb-3">
-                        <!-- Image URL -->
+                        <!-- Image Upload -->
                         <div class="col-md-6">
-                            <label class="small mb-1" for="image_url">Image URL</label>
-                            <input type="url" name="image_url" id="image_url" class="form-control" value="{{ $onBoarding->image_url }}" required />
-                            @error('image_url')
+                            <label class="small mb-1" for="image_url">Upload Image</label>
+                            <input type="file" name="image_url" id="image_url" class="form-control" accept="image/*" required onchange="previewImage(event)" />
+                            <img id="image_preview" src="#" alt="Image Preview" style="display:none; margin-top:10px; max-width:100%;" />
+                            @error('image')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
@@ -91,5 +92,23 @@
         </div>
     </div>
 </main>
+
+<script>
+    function previewImage(event) {
+        const imagePreview = document.getElementById('image_preview');
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            imagePreview.src = '#';
+            imagePreview.style.display = 'none';
+        }
+    }
+</script>
 
 @endsection

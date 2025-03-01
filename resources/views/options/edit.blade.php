@@ -1,10 +1,11 @@
 @extends('layout')
+@section('title', 'Edit Option')
 
 @section('content')
 
 
     <main>
-   
+
 
         <!-- Main page content-->
         <div class="container mt-n5">
@@ -37,7 +38,7 @@
                         <input id="key" class="form-control" value="{{$option->key}}" readonly/>
                         <input  type="hidden" name="key"  value="{{$option->key}}" />
 
-                                
+
                                 @error('key')
                                 {{$message}} @enderror
                         </div>

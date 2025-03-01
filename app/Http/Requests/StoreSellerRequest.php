@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Validator;
 
 class StoreSellerRequest extends FormRequest
 {
@@ -43,9 +44,9 @@ class StoreSellerRequest extends FormRequest
             case 2:
                 $rules['discount_percentage'] = 'required|numeric|min:0|max:100';
                 $rules['excluded_products'] = 'required|array|min:1';
-                $rules['products.*.name'] = 'required|string';
+                $rules['excluded_products.*.name'] = 'required|string';
                 break;
-            case 3:
+            case 4:
                 $rules['products'] = 'required|array|min:1';
                 $rules['products.*.name'] = 'required|string';
                 $rules['products.*.price_before_discount'] = 'required|numeric';
@@ -57,6 +58,4 @@ class StoreSellerRequest extends FormRequest
 
         return $rules;
     }
-
-
 }

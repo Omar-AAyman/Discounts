@@ -21,12 +21,19 @@ class OnBoardingController extends Controller
 
     public function update(Request $request , $id){
         $data = $request->validate([
-            'image_url'=>'required',
+            'image_url'=>'required|image',
             'title'=>'required',
             'subtitle'=>'required',
             'textbutton'=>'required',
-
         ]);
+
+        if ($request->hasFile('image_url')) {
+            $image = $request->file('image_url');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images/onBoardingImages'), $imageName);
+            $data['image_url'] = $imageName;
+        }
+
         $onBoarding = OnBoarding::findOrFail($id);
         $onBoarding->update($data);
         return redirect()->route('onboardings.index')->with('success','updated successfully');

@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'All Options')
 
 @section('content')
 
@@ -14,7 +15,7 @@
 
                     <div class="card">
                     <div class="card-header">Panel Options List
-                   
+
                     </div>
                         @if (session('success'))
 
@@ -29,21 +30,21 @@
 
                         @if ($options->isEmpty())
                         <div class="card-body">
-                         
+
                             <h4>No options</h4>
-                         </div>     
+                         </div>
                          @else
                          <div class="card-body">
                                 <table id="myTable" class="table small-table-text">
                                     <thead>
                                     <tr style="white-space: nowrap; font-size: 14px;">
 
-                                        
+
                                         <th>Key</th>
                                         <th>Value</th>
-                                        
+
                                         <th>Actions</th>
-                                        
+
 
                                     </tr>
                                     </thead>
@@ -53,16 +54,16 @@
 
                                             <td class=" text-black"><b>{{ $option->key }}</b></td>
                                             <td style="color: black;">{{ $option->value }}</td>
-                                            
-                                            
+
+
                                             <td>
-                                            <a class="btn btn-primary btn-sm" href="{{route('options.edit' , ['id'=>$option['id'] ])}}" >   
+                                            <a class="btn btn-primary btn-sm" href="{{route('options.edit' , ['id'=>$option['id'] ])}}" >
                                             Edit
                                               </a>
-                                        
 
-                                        
-                                        
+
+
+
                                         </td>
 
                                         </tr>
@@ -73,11 +74,11 @@
                             </div>
                         @endif
 
-                       
+
                     </div>
                 </div>
 
-        
+
     </main>
 
 

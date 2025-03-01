@@ -30,5 +30,12 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
-
+    'fcm' => [
+        'credentials' => env('FIREBASE_CREDENTIALS'),
+        'url' => env('FCM_API_URL'),
+    ],
+    'lahza' => [
+        'api_key' => env('LAHZA_API_KEY'),
+        'base_url' => env('LAHZA_BASE_URL', 'https://api.lahza.io/'),
+    ],
 ];

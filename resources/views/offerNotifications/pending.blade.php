@@ -1,4 +1,6 @@
 @extends('layout')
+@section('title', 'Offers Pending Requests')
+
 @section('content')
 
 <main>
@@ -29,11 +31,11 @@
                         <table id="myTable" class="table small-table-text">
                             <thead>
                                 <tr style="white-space: nowrap; font-size: 14px;">
-                                   
+
                                     <th>offer belongs to store</th>
                                     <th>Old discount (%)</th>
                                     <th>New requested discount % </th>
-                                  
+
                                     <th></th>
                                     <th></th>
                                 </tr>
@@ -44,22 +46,22 @@
                                         <td>{{ $changeRequest->offer->store->name }}</td>
                                         <td>{{ $changeRequest->offer->discount_percentage }}</td>
                                         <td>{{ $changeRequest->new_discount_percentage }}</td>
-                                        
-                                       
+
+
                                         <td>
                                             <form method="post" action="{{ route('offerNotifications.accept', $changeRequest->id) }}">
-                                                @csrf 
+                                                @csrf
                                                 <button type="submit" class="btn btn-success btn-xs">Accept</button>
- 
+
                                             </form>
 
                                         </td>
-                                                       
+
                                         <td>
                                             <form method="post" action="{{ route('offerNotifications.reject', $changeRequest->id) }}">
-                                                @csrf 
+                                                @csrf
                                                 <button type="submit" class="btn btn-danger btn-xs">Reject</button>
- 
+
                                             </form>
 
                                         </td>

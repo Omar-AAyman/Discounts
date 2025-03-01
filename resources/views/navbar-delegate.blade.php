@@ -10,7 +10,6 @@
                         Main Page
                     </a>
 
-                    
 
 
 
@@ -21,9 +20,12 @@
                     </a>
                     <div class="collapse" id="collapseDashboardsr5" data-parent="#accordionSidenav">
                         <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPages">
-                            
+                            <a class="nav-link" href="{{route('delegates.relatedSellers')}}">
+                                Related Sellers
+
+                             </a>
                             <a class="nav-link" href="{{route('delegates.createSeller')}}">
-                               Add New Seller 
+                               Add New Seller
 
                             </a>
 

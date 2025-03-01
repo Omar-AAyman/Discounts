@@ -14,18 +14,19 @@ class Section extends Model
                 protected static function boot()
                 {
                     parent::boot();
-            
+
                     static::creating(function ($model) {
                         if (empty($model->uuid)) {
                             $model->uuid = (string) Uuid::uuid4();
                         }
                     });
-                } 
+                }
     protected $table = 'sections';
     protected $fillable = ['name','type','package_id','uuid','is_online','description'];
-    
-    public function package(){
-        return $this->belongsTo(Package::class);
+
+    public function packages()
+    {
+        return $this->belongsToMany(Package::class, 'package_section');
     }
 
     public function stores(){

@@ -15,7 +15,7 @@ class OffersApi extends Controller
     public function offers()
     {
 
-        $offers = Offer::where('is_online', 1)->with('store')->get();
+        $offers = Offer::where('is_online', operator: 1)->with('store.user')->get();
         return response(['offers' => $offers]);
     }
 

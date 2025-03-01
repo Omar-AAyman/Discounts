@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'All Packages')
 
 @section('content')
 
@@ -14,7 +15,7 @@
 
                     <div class="card">
                     <div class="card-header">Packages List
-                   
+
                     </div>
                         @if (session('success'))
 
@@ -29,9 +30,9 @@
 
                         @if ($packages->isEmpty())
                         <div class="card-body">
-                         
+
                             <h4>No packages</h4>
-                         </div>     
+                         </div>
                          @else
                          <div class="card-body">
                                 <table id="myTable" class="table small-table-text">
@@ -43,7 +44,7 @@
                                         <th>Is Online</th>
                                         <th>Actions</th>
                                         <th></th>
-                                        
+
 
                                     </tr>
                                     </thead>
@@ -61,28 +62,28 @@
                                                                 }
                                                             @endphp
 
-                                            </td>   
+                                            </td>
 
                                             <td>
                                                 <span class="badge {{ $package->is_online ? 'badge-green' : 'badge-red' }}">
                                                     {{ $package->is_online ? 'Online' : 'Offline' }}
                                                     </span>
-                 
+
                                             </td>
-                                            
+
                                             <td>
-                                            <a class="btn btn-primary btn-sm" href="{{route('packages.edit' , ['uuid'=>$package['uuid'] ])}}" >   
+                                            <a class="btn btn-primary btn-sm" href="{{route('packages.edit' , ['uuid'=>$package['uuid'] ])}}" >
                                             Edit
                                               </a>
-                                        
 
-                                        
-                                        
+
+
+
                                         </td>
                                         <td>
-                                        <a class="btn btn-success btn-sm" href="{{route('packages.showSections' , ['uuid'=>$package['uuid'] ])}}" >   
-                                           Show sections 
-                                              </a> 
+                                        <a class="btn btn-success btn-sm" href="{{route('packages.showSections' , ['uuid'=>$package['uuid'] ])}}" >
+                                           Show sections
+                                              </a>
                                         </td>
 
                                         </tr>
@@ -93,11 +94,11 @@
                             </div>
                         @endif
 
-                       
+
                     </div>
                 </div>
 
-        
+
     </main>
 
 

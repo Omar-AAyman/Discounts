@@ -1,10 +1,11 @@
 @extends('layout')
+@section('title', 'Subscribe a Guest')
 
 @section('content')
 
 
     <main>
-   
+
 
         <!-- Main page content-->
         <div class="container mt-n5">
@@ -45,11 +46,11 @@
                                     <option value="{{$user->id}}">{{$user->first_name}} {{$user->last_name}}</option>
                                     @endforeach
                                 </select>
-                                
+
                         </div>
-                   
-                    
-                       
+
+
+
                         <div class="col-md-6" style="margin-top: 35px;">
                         <button type="submit" class="btn btn-primary btn-sm">Submit</button>
                     </div></div>

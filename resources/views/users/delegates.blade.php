@@ -1,4 +1,5 @@
 @extends('layout')
+@section('title', 'Delegates')
 
 @section('content')
 
@@ -14,7 +15,7 @@
 
                     <div class="card">
                     <div class="card-header">Delegates List
-                   
+
                     </div>
                         @if (session('success'))
 
@@ -29,9 +30,9 @@
 
                         @if ($users->isEmpty())
                         <div class="card-body">
-                         
+
                             <h4>No Sellers</h4>
-                         </div>     
+                         </div>
                          @else
                          <div class="card-body">
                                 <table id="myTable" class="table small-table-text">
@@ -43,7 +44,7 @@
                                         <th>Phone</th>
                                         <th>Is Online</th>
                                         <th>Actions</th>
-                                        
+
 
                                     </tr>
                                     </thead>
@@ -58,17 +59,17 @@
                                                 <span class="badge {{ $user->is_online ? 'badge-green' : 'badge-red' }}">
                                                     {{ $user->is_online ? 'Online' : 'Offline' }}
                                                     </span>
-                 
+
                                             </td>
-                                            
+
                                             <td>
-                                            <a class="btn btn-primary btn-sm" href="{{route('users.edit' , ['uuid'=>$user['uuid'] ])}}" >   
+                                            <a class="btn btn-primary btn-sm" href="{{route('users.edit' , ['uuid'=>$user['uuid'] ])}}" >
                                             Edit
                                               </a>
-                                        
 
-                                        
-                                        
+
+
+
                                         </td>
 
                                         </tr>
@@ -79,11 +80,11 @@
                             </div>
                         @endif
 
-                       
+
                     </div>
                 </div>
 
-        
+
     </main>
 
 

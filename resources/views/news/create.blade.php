@@ -1,4 +1,6 @@
 @extends('layout')
+@section('title', 'New Article')
+
 @section('content')
 <main>
 
@@ -10,7 +12,7 @@
                                 <div class="alert alert-danger">
                                     {{ $errors->first('fail') }}
                                 </div>
-                            @endif 
+                            @endif
 
 
                   <div class="row m-5">
@@ -25,7 +27,7 @@
                                         <!-- Profile picture upload button-->
                                         <form  method="POST" action="{{ route('news.store' ) }}" enctype="multipart/form-data" id="image-form">
                                         @csrf
-                                        
+
                                         <label for="img" class="btn btn-primary btn-sm">
                                             Upload New Image
                                         </label>
@@ -38,30 +40,30 @@
                                 <div class="card mb-4">
                                     <div class="card-header">News Details</div>
                                     <div class="card-body">
-                                       
+
                                         <!-- Form Row-->
-                                           
+
                                             <div class="row gx-3 mb-3">
-                                               
+
                                                 <div class="col-md-6">
                                                 <label for="title" class="form-label"> Title </label>
 
-                                                   
+
                                                     <input class="form-control" name="title"  type="text"  value="{{ old('title') }}" required  />
-                                                  
+
                                                 </div>
 
                                                 <div class="col-md-6">
                                                 <label for="description" class="form-label"> Description </label>
 
-                                                   
+
                                                    <textarea class="form-control" name="description"  type="text" required>{{old('description')}}</textarea>
-                                                 
+
                                                </div>
-                                                
-                                                
+
+
                                             </div>
-                                           
+
                                             <div class="row gx-3 mb-3">
                                             <div class="col-12">
                                             <button class="btn btn-primary btn-sm" type="submit">Submit</button></div></div>
@@ -86,4 +88,4 @@
         // Submit form after selecting image
     }
 </script>
-@endsection                       
+@endsection

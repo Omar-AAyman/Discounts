@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class UpdateSellerRequest extends FormRequest
 {
@@ -39,7 +40,7 @@ class UpdateSellerRequest extends FormRequest
             'store_name' => 'required',
             'section_id' => 'nullable|exists:sections,id',
 
-            'sector_representative' => 'required',
+            'sector_representative' => 'nullable',
             'work_hours' => 'required',
             'work_days' => 'required|array|min:1',
 
@@ -48,17 +49,19 @@ class UpdateSellerRequest extends FormRequest
 
         switch ($this->getSellerTypeId()) {
             case 1:
-                $rules['discount_percentage'] = 'required|numeric|min:0|max:100';
+                $rules['discount_percentage'] = 'nullable|numeric|min:0|max:100';
                 break;
             case 2:
-                $rules['discount_percentage'] = 'required|numeric|min:0|max:100';
-                $rules['excluded_products'] = 'required|array|min:1';
-                $rules['products.*.name'] = 'required|string';
+                $rules['discount_percentage'] = 'nullable|numeric|min:0|max:100';
+                $rules['excluded_products'] = 'nullable|array|min:1';
+                $rules['excluded_products.*.id'] = 'nullable|string';
+                $rules['excluded_products.*.name'] = 'nullable|string';
                 break;
-            case 3:
-                $rules['products'] = 'required|array|min:1';
-                $rules['products.*.name'] = 'required|string';
-                $rules['products.*.price_before_discount'] = 'required|numeric';
+            case 4:
+                $rules['products'] = 'nullable|array|min:1';
+                $rules['products.*.id'] = 'nullable|string';
+                $rules['products.*.name'] = 'nullable|string';
+                $rules['products.*.price_before_discount'] = 'nullable|numeric';
                 $rules['products.*.discount_percentage'] = 'nullable|numeric|min:0|max:100';
                 $rules['products.*.discount_amount'] = 'nullable|numeric|min:0';
                 break;
@@ -66,6 +69,7 @@ class UpdateSellerRequest extends FormRequest
 
         return $rules;
     }
+
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {

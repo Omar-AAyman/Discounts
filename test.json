@@ -1,6 +1,108 @@
-[{"key":"password","value":"Qwertyuiop","type":"text","enabled":false},{"key":"fcm_token","value":"tokenhere","type":"text","enabled":true},{"key":"email","value":"ssda@gmail.com","type":"text","enabled":true},{"key":"password","value":"myPassword33","type":"text","enabled":true}]
-[{"key":"password","value":"Qwertyuiop","type":"text","enabled":false},{"key":"fcm_token","value":"tokenhere","type":"text","enabled":true},{"key":"email","value":"ssda@gmail.com","type":"text","enabled":true},{"key":"password","value":"myPassword33","type":"text","enabled":true}]
-[{"key":"first_name","value":"John","type":"text","enabled":true},{"key":"last_name","value":"Doe","type":"text","enabled":true},{"key":"email","value":"john.doe@example.com","type":"text","enabled":true},{"key":"phone","value":"+123456789","type":"text","enabled":true},{"key":"password","value":"+123456789","type":"text","enabled":true},{"key":"password_confirmation","value":"+123456789","type":"text","enabled":true},{"key":"whatsapp_number","value":"+987654321","type":"text","enabled":true},{"key":"store_name","value":"John's Store","type":"text","enabled":true},{"key":"store_description","value":"A description of the store.","type":"text","enabled":true},{"key":"section_id","value":"1","type":"number","enabled":true},{"key":"sector_representative","value":"Rep Name","type":"text","enabled":true},{"key":"location","value":"Location Name","type":"text","enabled":true},{"key":"working_hours","value":"9:00 AM - 5:00 PM","type":"text","enabled":true},{"key":"working_days","value":["Monday","Tuesday","Wednesday","Thursday","Friday"],"type":"text","enabled":true},{"key":"branches[0][city]","value":"City Name","type":"text","enabled":true},{"key":"branches[0][country]","value":"Country Name","type":"text","enabled":true},{"key":"contract_img","value":"[File Upload]","type":"file","enabled":true},{"key":"store_img","value":"[File Upload]","type":"file","enabled":true},{"key":"products[0][name]","value":"product 1","type":"text","enabled":true},{"key":"products[0][price_before_discount]","value":"100","type":"number","enabled":true},{"key":"products[0][discount_percentage]","value":"10","type":"number","enabled":true},{"key":"products[1][name]","value":"product 2","type":"text","enabled":true},{"key":"products[1][price_before_discount]","value":"50","type":"number","enabled":true},{"key":"products[1][discount_amount]","value":"5","type":"number","enabled":true}]
-dede
-
-
+[
+    2025-02-28 13: 47: 51
+] local.INFO: test {
+    "url": "https://api.lahza.io/transaction/verify/T5680917971745051"
+}
+[
+    2025-02-28 13: 47: 52
+] local.INFO: response {
+    "": {
+        "status": true,
+        "message": "Transaction retrieved",
+        "data": {
+            "amount": "5999",
+            "channel": "card",
+            "createdAt": "2025-02-28T13:47:20.000000Z",
+            "currency": "ILS",
+            "ip_address": "2c0f:fc89:80a6:9b09:303e:8adc:9a47:d1fc",
+            "fees": "150",
+            "customer": {
+                "id": "0da6fe2e-6c74-4cb8-91be-c818e8ec19c8",
+                "customer_code": "CUS_bkvQqDXtAgbkF5s6nbs1",
+                "first_name": null,
+                "last_name": null,
+                "email": null,
+                "phone": null,
+                "created_at": "2025-02-27T23:34:27.000000Z",
+                "updated_at": "2025-02-27T23:34:27.000000Z"
+            },
+            "authorization": {
+                "authorization_code": "AUTH_1JwVqYKQdF",
+                "bin": "411111",
+                "last4": "1111",
+                "exp_month": "03",
+                "exp_year": "30",
+                "channel": "card",
+                "card_type": null,
+                "bank": null,
+                "country_code": null,
+                "brand": "Visa",
+                "reusable": 1,
+                "stan": null,
+                "signature": "SIG_JJx2N7ItRsaPxC2Q2C",
+                "account_name": null
+            },
+            "gateway_response": "Approved",
+            "id": "946323702171778254455763",
+            "metadata": null,
+            "paidAt": "2025-02-28T13:47:42.000000Z",
+            "settledAt": null,
+            "reference": "T5680917971745051",
+            "status": "success",
+            "captured_at": null
+        }
+    }
+}
+[
+    2025-02-28 13: 47: 52
+] local.INFO: payment Succeed {
+    "": {
+        "status": true,
+        "message": "Transaction retrieved",
+        "data": {
+            "amount": "5999",
+            "channel": "card",
+            "createdAt": "2025-02-28T13:47:20.000000Z",
+            "currency": "ILS",
+            "ip_address": "2c0f:fc89:80a6:9b09:303e:8adc:9a47:d1fc",
+            "fees": "150",
+            "customer": {
+                "id": "0da6fe2e-6c74-4cb8-91be-c818e8ec19c8",
+                "customer_code": "CUS_bkvQqDXtAgbkF5s6nbs1",
+                "first_name": null,
+                "last_name": null,
+                "email": null,
+                "phone": null,
+                "created_at": "2025-02-27T23:34:27.000000Z",
+                "updated_at": "2025-02-27T23:34:27.000000Z"
+            },
+            "authorization": {
+                "authorization_code": "AUTH_1JwVqYKQdF",
+                "bin": "411111",
+                "last4": "1111",
+                "exp_month": "03",
+                "exp_year": "30",
+                "channel": "card",
+                "card_type": null,
+                "bank": null,
+                "country_code": null,
+                "brand": "Visa",
+                "reusable": 1,
+                "stan": null,
+                "signature": "SIG_JJx2N7ItRsaPxC2Q2C",
+                "account_name": null
+            },
+            "gateway_response": "Approved",
+            "id": "946323702171778254455763",
+            "metadata": null,
+            "paidAt": "2025-02-28T13:47:42.000000Z",
+            "settledAt": null,
+            "reference": "T5680917971745051",
+            "status": "success",
+            "captured_at": null
+        }
+    }
+}
+[
+    2025-02-28 13: 47: 52
+] local.ERROR: Callback handling failed: Undefined array key "status"
