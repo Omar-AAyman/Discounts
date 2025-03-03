@@ -57,11 +57,11 @@
                 </a>
                 <div class="collapse" id="collapseStores" data-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav accordion">
-                        <a class="nav-link" href="{{route('stores.index')}}"><i class="fas fa-list-alt"></i> All Stores</a>
+                        {{-- <a class="nav-link" href="{{route('stores.index')}}"><i class="fas fa-list-alt"></i> All Stores</a> --}}
                         <a class="nav-link" href="{{route('store-and-seller.index')}}"><i class="fas fa-store-alt"></i> Stores & Sellers</a>
                         <a class="nav-link" href="{{route('stores.showSellersRequests')}}"><i class="fas fa-clock"></i> Pending Stores</a>
                         <a class="nav-link" href="{{route('stores.deleteRequests')}}"><i class="fas fa-trash"></i> Delete Requests</a>
-                        <a class="nav-link" href="{{route('stores.create')}}"><i class="fas fa-plus-circle"></i> New Store</a>
+                        {{-- <a class="nav-link" href="{{route('stores.create')}}"><i class="fas fa-plus-circle"></i> New Store</a> --}}
                         <a class="nav-link" href="{{route('stores.showChangeDiscountRequests')}}"><i class="fas fa-exchange-alt"></i> Discount Requests</a>
                     </nav>
                 </div>

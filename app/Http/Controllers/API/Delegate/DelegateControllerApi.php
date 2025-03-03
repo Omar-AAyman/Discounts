@@ -143,14 +143,9 @@ class DelegateControllerApi extends Controller
                 'email' => $request->email ?? $seller->email,
                 'phone' => $request->phone ?? $seller->phone,
                 'phone2' => $request->whatsapp_number ?? $seller->phone2,
-                'password' => Hash::make($request->password),
                 'city' => $request->branches[0]['city'] ?? $seller->city,
                 'country' => $request->branches[0]['country'] ?? $seller->country,
             ];
-            // Only update the password if it is present in the request
-            if ($request->filled('password')) {
-                $updateData['password'] = Hash::make($request->password);
-            }
 
             $seller->update($updateData);
 
@@ -441,7 +436,7 @@ class DelegateControllerApi extends Controller
         [$red, $green, $blue] = $color;
 
         // Generate QR content with UUID-based URL
-        $qrContent = $store->uuid;
+        $qrContent = $store->user->seller_type_id.'_'.$store->uuid;
 
         // Generate the QR code with custom color
         $qrCode = QrCode::format('svg')

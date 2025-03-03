@@ -25,38 +25,41 @@
                         {{ session('fail') }}
                     </div>
                     @endif
+                    <div class="table-responsive">
 
-                    <table id="deleteRequestsTable" class="table small-table-text text-center">
-                        <thead>
-                            <tr style="white-space: nowrap; font-size: 14px;">
-                                <th>Store Name</th>
-                                <th>Seller Name</th>
-                                <th>Requested By</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($stores as $store)
-                            <tr style="white-space: nowrap; font-size: 14px;">
-                                <td>{{ $store->name }}</td>
-                                <td>{{ $store->user->fullname }}</td>
-                                <td>{{ $store->delegate->fullname ?? 'N/A' }}</td>
-                                <td>
-                                    <div class="d-flex gap-2 justify-content-center">
-                                        <form method="post" action="{{ route('stores.processDeleteRequest', $store->id) }}">
-                                            @csrf
-                                            <button type="submit" name="action" value="approve" class="btn btn-success btn-xs mx-1">✅ Approve</button>
-                                        </form>
-                                        <form method="post" action="{{ route('stores.processDeleteRequest', $store->id) }}">
-                                            @csrf
-                                            <button type="submit" name="action" value="reject" class="btn btn-danger btn-xs">❌ Reject</button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                        <table id="deleteRequestsTable" class="table small-table-text text-center">
+                            <thead>
+                                <tr style="white-space: nowrap; font-size: 14px;">
+                                    <th>Store Name</th>
+                                    <th>Seller Name</th>
+                                    <th>Requested By</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($stores as $store)
+                                <tr style="white-space: nowrap; font-size: 14px;">
+                                    <td>{{ $store->name }}</td>
+                                    <td>{{ $store->user->fullname }}</td>
+                                    <td>{{ $store->delegate->fullname ?? 'N/A' }}</td>
+                                    <td>
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <form method="post" action="{{ route('stores.processDeleteRequest', $store->id) }}">
+                                                @csrf
+                                                <button type="submit" name="action" value="approve" class="btn btn-success btn-xs mx-1">✅ Approve</button>
+                                            </form>
+                                            <form method="post" action="{{ route('stores.processDeleteRequest', $store->id) }}">
+                                                @csrf
+                                                <button type="submit" name="action" value="reject" class="btn btn-danger btn-xs">❌ Reject</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
                 @endif
             </div>

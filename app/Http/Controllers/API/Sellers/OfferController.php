@@ -129,6 +129,8 @@ class OfferController extends Controller
 
         $offer->update([
             'discount_percentage' => $request->discount_percentage,
+            'discount_amount' => $request->discount_amount ? $request->discount_amount : null,
+            'price_before_discount' => $request->price_before_discount,
             'img' => $request->bg_img,
         ]);
 

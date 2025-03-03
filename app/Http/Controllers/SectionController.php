@@ -6,7 +6,9 @@ use App\Models\Package;
 use App\Models\Section;
 use App\Models\Store;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Random\Engine\Secure;
+use Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SectionController extends Controller
@@ -37,8 +39,10 @@ class SectionController extends Controller
     {
         $data = $request->validate([
             'name' => 'required',
+            'name_ar' => 'required',
             'description' => 'required',
             'type' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             'package_ids' => 'required|array',
             'package_ids.*' => 'exists:packages,id',
         ], [
@@ -53,6 +57,11 @@ class SectionController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateData($request);
+
+        if ($request->hasFile('img')) {
+            $data['img'] = $this->uploadImage($request->file('img'), 'images/sectionImages');
+        }
+
         $section = Section::create($data);
 
         $section->packages()->attach($data['package_ids']);
@@ -76,6 +85,11 @@ class SectionController extends Controller
         $is_online = ['is_online' => $request->has('is_online') ? 1 : 0];
 
         $finalData = array_merge($data, $is_online);
+
+        if ($request->hasFile('img')) {
+            $this->deleteOldImage($section->img, 'images/sectionImages');
+            $finalData['img'] = $this->uploadImage($request->file('img'), 'images/sectionImages');
+        }
 
         $section->update($finalData);
 
@@ -127,6 +141,37 @@ class SectionController extends Controller
         } else {
 
             throw new NotFoundHttpException();
+        }
+    }
+
+
+    // private function uploadImage($image, $path)
+    // {
+    //     $imageName = time() . '.' . $image->getClientOriginalExtension();
+    //     $image->move(public_path($path), $imageName);
+    //     return $path . '/' . $imageName;
+    // }
+
+    /**
+     * Uploads a new image and returns the file name.
+     */
+    private function uploadImage(UploadedFile $image, string $directory): string
+    {
+        $imageName = hash('sha256', time() . Str::random(10)) . '.' . $image->getClientOriginalExtension();
+
+        $destinationPath = public_path($directory);
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0777, true);
+        }
+
+        $image->move($destinationPath, $imageName);
+        return $imageName;
+    }
+
+    private function deleteOldImage($imagePath, $basePath)
+    {
+        if ($imagePath && file_exists(public_path($imagePath))) {
+            unlink(public_path($imagePath));
         }
     }
 }

@@ -4,91 +4,94 @@
 @section('content')
 
 
-    <main>
+<main>
 
 
-        <!-- Main page content-->
-        <div class="container mt-n5">
+    <!-- Main page content-->
+    <div class="container mt-n5">
 
 
-                    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 
-                    <div class="card">
-                    <div class="card-header">Pending Adding Sellers Requests
+        <div class="card">
+            <div class="card-header">Pending Adding Sellers Requests
 
-                    </div>
-                        @if (session('success'))
+            </div>
+            @if (session('success'))
 
-                        <div class="alert alert-success m-3" role="alert">{{ session('success') }}</div>
-                        @endif
-                        @if ($errors->has('fail'))
-                            <div class="alert alert-danger m-3">
-                                {{ $errors->first('fail') }}
-                            </div>
-                        @endif
-
-
-                        @if ($stores->isEmpty())
-                        <div class="card-body">
-
-                            <h4>No requests yet</h4>
-                         </div>
-                         @else
-                         <div class="card-body">
-                                <table id="myTable" class="table small-table-text text-center">
-                                    <thead>
-                                    <tr style="white-space: nowrap; font-size: 14px;">
-
-                                        <th>Delegate Name</th>
-                                        <th>Seller Name</th>
-                                        <th>Store</th>
-                                        <th>Section</th>
-                                        <th>Created At</th>
-                                        <th></th>
+            <div class="alert alert-success m-3" role="alert">{{ session('success') }}</div>
+            @endif
+            @if ($errors->has('fail'))
+            <div class="alert alert-danger m-3">
+                {{ $errors->first('fail') }}
+            </div>
+            @endif
 
 
+            @if ($stores->isEmpty())
+            <div class="card-body">
 
+                <h4>No requests yet</h4>
+            </div>
+            @else
+            <div class="card-body">
+                <div class="table-responsive">
 
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    @foreach ($stores  as $store )
-                                        @php
-                                         $delegate = DB::table('users')->where('id',$store->delegate_id)->first();
-                                          @endphp
-                                        <tr style="white-space: nowrap; font-size: 14px;">
+                <table id="myTable" class="table small-table-text text-center">
+                    <thead>
+                        <tr style="white-space: nowrap; font-size: 14px;">
 
-                                            <td class=" text-black"><b>{{ $delegate->first_name }} {{ $delegate->last_name }}</b></td>
-                                            <td class=" text-black"><b>{{$store->seller_name}}</b></td>
-                                            <td>{{$store->name}}</td>
-                                            <td>{{$store->section->name}}</td>
-                                            <td>{{ \Carbon\Carbon::parse($store->created_at)->format('d-m-Y')}}</td>
-                                            <td>
-                                            <form method="get" action="{{route('stores.approveSeller')}}">
-                                                @csrf
-                                                <input type="hidden" name="store_id" value="{{$store->id}}"/>
-                                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                                            </form>
+                            <th>Delegate Name</th>
+                            <th>Seller Name</th>
+                            <th>Store</th>
+                            <th>Section</th>
+                            <th>Created At</th>
+                            <th></th>
 
 
 
 
-                                        </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($stores as $store )
+                        @php
+                        $delegate = DB::table('users')->where('id',$store->delegate_id)->first();
+                        @endphp
+                        <tr style="white-space: nowrap; font-size: 14px;">
 
-                                        </tr>
-                                    @endforeach
-                                    </tbody>
-                                </table>
+                            <td class=" text-black"><b>{{ $delegate->first_name }} {{ $delegate->last_name }}</b></td>
+                            <td class=" text-black"><b>{{$store->seller_name}}</b></td>
+                            <td>{{$store->name}}</td>
+                            <td>{{$store->section->name}}</td>
+                            <td>{{ \Carbon\Carbon::parse($store->created_at)->format('d-m-Y')}}</td>
+                            <td>
+                                <form method="get" action="{{route('stores.approveSeller')}}">
+                                    @csrf
+                                    <input type="hidden" name="store_id" value="{{$store->id}}" />
+                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                </form>
 
-                            </div>
-                        @endif
 
 
-                    </div>
-                </div>
+
+                            </td>
+
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            </div>
+            @endif
 
 
-    </main>
+        </div>
+    </div>
+
+
+</main>
 
 
 
@@ -98,9 +101,8 @@
     let table = new DataTable('#myTable', {
         ordering: false // Disable DataTables' default ordering
     });
+
 </script>
 
 
 @endsection
-
-

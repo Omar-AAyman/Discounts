@@ -3,19 +3,15 @@
 
 @section('content')
 
-
     <main>
-
 
         <!-- Main page content-->
         <div class="container mt-n5">
-
 
                     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
                     <div class="card">
                     <div class="card-header">Edit section</div>
                     <div class="card-body">
-
 
                     @if ($errors->any())
                         <div class="alert alert-danger">
@@ -27,7 +23,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('sections.update',$section->uuid) }}" method="POST" >
+                    <form action="{{ route('sections.update',$section->uuid) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -37,6 +33,14 @@
                         <label class="small mb-1" for="name">Name </label>
                         <input type="text" name="name" id="name" class="form-control" value="{{$section->name}}" required/>
                         @error('name')
+                                {{$message}}
+                        @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                        <label class="small mb-1" for="name_ar">Name (Arabic)</label>
+                        <input type="text" name="name_ar" id="name_ar" class="form-control" value="{{$section->name_ar ?? ''}}" required/>
+                        @error('name_ar')
                                 {{$message}}
                         @enderror
                         </div>
@@ -59,7 +63,6 @@
                         @error('type')
                                 {{$message}}
                         @enderror
-
                 </div>
                         <div class="col-md-6">
                         <label class="small mb-1" for="description">Description </label>
@@ -70,11 +73,22 @@
                         </div>
                         </div>
 
+                        <div class="row gx-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="small mb-1" for="img">Image</label>
+                                <input type="file" name="img" id="img" class="form-control" accept="image/*" onchange="previewImage(event)"/>
+                                @error('img')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                                <br>
+                                <img id="img_preview" src="{{$section->img ?? ''}}" alt="Image Preview" style="max-width: 100px; display: {{$section->img ? 'block' : 'none'}};"/>
+                            </div>
+                        </div>
+
                         <div class="row gx-3 mb-3" style="margin-top: 40px;">
                         <div class="col-md-6">
                         <label class="small mb-1" for="is_online">Is online</label>
                         <input id="is_online" type="checkbox"  name="is_online" {{$section->is_online? 'checked':''}}>
-
                         </div>
                         <div class="col-md-6">
                         <button type="submit" class="btn btn-primary btn-sm">Update</button>
@@ -86,7 +100,16 @@
         </div>
     </main>
 
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const output = document.getElementById('img_preview');
+                output.src = reader.result;
+                output.style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
 
 @endsection
-
-

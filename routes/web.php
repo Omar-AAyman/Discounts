@@ -59,11 +59,11 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/admin/packages/sections/{uuid}', [PackageController::class, 'showSections'])->name('packages.showSections');
 
     // stores routes
-    Route::get('/admin/stores', [StoreController::class, 'index'])->name('stores.index');
-    Route::get('/admin/stores/create', [StoreController::class, 'create'])->name('stores.create');
-    Route::get('/admin/stores/edit/{uuid}', [StoreController::class, 'edit'])->name('stores.edit');
-    Route::post('/admin/stores/store', [StoreController::class, 'store'])->name('stores.store');
-    Route::put('/admin/stores/update/{uuid}', [StoreController::class, 'update'])->name('stores.update');
+    // Route::get('/admin/stores', [StoreController::class, 'index'])->name('stores.index');
+    // Route::get('/admin/stores/create', [StoreController::class, 'create'])->name('stores.create');
+    // Route::get('/admin/stores/edit/{uuid}', [StoreController::class, 'edit'])->name('stores.edit');
+    // Route::post('/admin/stores/store', [StoreController::class, 'store'])->name('stores.store');
+    // Route::put('/admin/stores/update/{uuid}', [StoreController::class, 'update'])->name('stores.update');
     Route::get('/admin/store/show/requests', [StoreController::class, 'showSellersRequests'])->name('stores.showSellersRequests');
     Route::get('/admin/stores/approve/seller', [StoreController::class, 'approveSeller'])->name('stores.approveSeller');
     Route::post('/admin/stores/add/seller', [StoreController::class, 'addSeller'])->name('stores.addSeller');

@@ -31,7 +31,7 @@ class DiscountController extends Controller
                 'success' => false,
                 'message' => 'Validation failed.',
                 'data' => $validator->errors()
-            ], 422);
+            ], 200);
         }
 
         // Get the authenticated user
@@ -41,7 +41,7 @@ class DiscountController extends Controller
                 'success' => false,
                 'message' => 'Unauthorized.',
                 'data' => null
-            ], 401);
+            ], 200);
         }
 
         // Check if the store exists
@@ -51,7 +51,7 @@ class DiscountController extends Controller
                 'success' => false,
                 'message' => 'Store not found.',
                 'data' => null
-            ], 404);
+            ], 200);
         }
 
         // Get the seller (store owner)
@@ -61,7 +61,7 @@ class DiscountController extends Controller
                 'success' => false,
                 'message' => 'Seller not found.',
                 'data' => null
-            ], 404);
+            ], 200);
         }
 
         try {
@@ -80,7 +80,7 @@ class DiscountController extends Controller
                     'success' => false,
                     'message' => 'You already have a pending discount request for this store.',
                     'data' => null
-                ], 409);
+                ], 200);
             }
 
             // Create a new invoice
@@ -110,7 +110,7 @@ class DiscountController extends Controller
                 'success' => true,
                 'message' => 'Discount request submitted successfully. Seller has been notified.',
                 'data' => $invoice
-            ], 201);
+            ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -132,7 +132,7 @@ class DiscountController extends Controller
                 'success' => false,
                 'message' => 'Unauthorized.',
                 'data' => null
-            ], 401);
+            ], 200);
         }
 
         // Determine the date filter

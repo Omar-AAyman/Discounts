@@ -6,10 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Jobs\SendPushNotificationJob;
 use App\Models\Invoice;
 use App\Models\Package;
+use App\Models\Subscription;
 use App\Models\User;
 use App\Services\LahzaPaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\File;
+use Laravel\Sanctum\PersonalAccessToken;
+use stdClass;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class SubscriptionController extends Controller
 {
@@ -20,21 +27,58 @@ class SubscriptionController extends Controller
             'period_in_months' => 'required|in:1,3,6,12',
         ]);
 
-        $package = Package::findOrFail($validated['package_id']);
-        $getPackageCostVarName = strtolower($package->name) . '_cost_per_month';
-        $package->amount = $package->$getPackageCostVarName; // Access the dynamic attribute
-        $package->period_in_months = $validated['period_in_months']; // Access the dynamic attribute
-
         // Ensure user is authenticated before accessing their data
         if (!auth()->check()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $userData = auth()->user()->toArray() + $validated;
+        $user = auth()->user();
+
+        // Check for existing active subscription
+        $currentSubscription = Subscription::where('user_id', $user->id)
+            ->where('is_online', 1)
+            ->latest()
+            ->first();
+
+        if ($currentSubscription) {
+            $currentExpiresAt = $currentSubscription->created_at->copy()->addMonths($currentSubscription->period_in_months);
+
+            // Mark subscription as expired if needed
+            if (!$currentSubscription->is_online || $currentSubscription->expires_at < now() || $currentExpiresAt < now()) {
+                $currentSubscription->update(['is_online' => false]);
+            }
+
+            // Prevent new subscription if current is still active and not a guest subscription
+            if ($currentExpiresAt > now() && $currentSubscription->type !== 'guest_subscription') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'You already have an active subscription.',
+                    'payment_url' => null,
+                    'current_subscription' => [
+                        'package' => Package::find($currentSubscription->package_id)->name,
+                        'expires_at' => $currentExpiresAt->toDateTimeString(),
+                        'type' => $currentSubscription->type,
+                    ]
+                ], 200);
+            }
+        }
+
+        // Proceed with payment initiation
+        $package = Package::findOrFail($validated['package_id']);
+        $getPackageCostVarName = strtolower($package->name) . '_cost_per_month';
+        $package->amount = $package->$getPackageCostVarName;
+        $package->period_in_months = $validated['period_in_months'];
+
+        $userData = $user->toArray() + $validated;
 
         try {
             $paymentUrl = $paymentService->initiatePayment($package, $userData);
-            return response()->json(['payment_url' => $paymentUrl]);
+            return response()->json([
+                'status' => true,
+                'message' => 'You have no active subscriptions, so you are eligible to subscribe.',
+                'payment_url' => $paymentUrl,
+                'current_subscription' => new stdClass()
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -71,7 +115,8 @@ class SubscriptionController extends Controller
                 $invoice = Invoice::create([
                     'user_id' => $user->id,
                     'subscription_id' => $subscription->id,
-                    'amount' => $subscription-> period_in_months ?? 1 * $package->amount,
+                    'amount' => ($subscription->period_in_months ?? 1) * $package->amount,
+                    'amount_after_discount' => ($subscription->period_in_months ?? 1) * $package->amount,
                     'status' => 'paid',
                     'type' => 'subscription',
                 ]);
@@ -85,11 +130,9 @@ class SubscriptionController extends Controller
                     'en_title' => 'Your Subscription is Active!',
                     'en_description' => 'Congratulations! Your subscription has been successfully activated. Enjoy your exclusive benefits now.',
                     'type' => 'subscription',
+                    'status' => 'success',
                 ];
 
-                // Dispatch push notification to the user
-                SendPushNotificationJob::dispatch($user, $notificationDetails, $user->operating_system);
-                // Attempt to send the push notification separately
                 try {
                     Log::info('Dispatching push notification', ['user_id' => $user->id]);
                     SendPushNotificationJob::dispatch($user, $notificationDetails, $user->operating_system);
@@ -102,7 +145,6 @@ class SubscriptionController extends Controller
                 }
 
                 return redirect()->route('payments-summary', ['status' =>  'success']);
-
             } else {
                 Log::warning('Payment not completed', ['subscription' => $subscription]);
 
@@ -117,6 +159,106 @@ class SubscriptionController extends Controller
                 'request_data' => request()->all(),
             ]);
             return redirect()->route('payments-summary', ['status' => 'fail']);
+        }
+    }
+
+    public function checkUserSubscription(Request $request)
+    {
+        $token = $request->bearerToken();
+
+        if (!$token) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized or Token has expired, please login again!',
+                'token_status' => false,
+                'subscription' => new stdClass(),
+            ]);
+        }
+
+        try {
+            // Authenticate user (JWT or Sanctum)
+            $accessToken = PersonalAccessToken::findToken($token);
+            $user = $accessToken ? $accessToken->tokenable : null;
+
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Unauthorized or Token has expired, please login again!',
+                    'token_status' => false,
+                    'subscription' => new stdClass(),
+                ]);
+            }
+
+            // **Check if user is a client**
+            if ($user->type === 'client') {
+                // Fetch the latest active subscription for the user
+                $subscription = Subscription::where('user_id', $user->id)
+                    ->where('type', 'user_subscription')
+                    ->latest()
+                    ->first();
+
+                if (!$subscription) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'No subscription found',
+                        'token_status' => true,
+                        'subscription' => new stdClass(),
+                    ]);
+                }
+
+                // Calculate expected expiration date
+                $periodInMonths = $subscription->period_in_months ?? 0;
+                $calculatedExpiresAt = $subscription->created_at->copy()->addMonths($periodInMonths);
+
+                if (!$subscription->is_online || $subscription->expires_at < now() || $calculatedExpiresAt < now()) {
+                    $subscription->update(['is_online' => false]);
+
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Subscription is expired or inactive',
+                        'token_status' => true,
+                        'subscription' => [
+                            'user_id' => $user->id,
+                            'package' => $subscription->package->name ?? null,
+                            'expires_at' => $subscription->expires_at,
+                            'is_online' => false,
+                            'created_at' => $subscription->created_at,
+                            'type' => $subscription->type,
+                            'period_in_months' => $periodInMonths,
+                        ],
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Subscription is active',
+                    'token_status' => true,
+                    'subscription' => [
+                        'user_id' => $user->id,
+                        'package' => $subscription->package->name ?? null,
+                        'expires_at' => $subscription->expires_at,
+                        'is_online' => true,
+                        'created_at' => $subscription->created_at,
+                        'type' => $subscription->type,
+                        'period_in_months' => $periodInMonths,
+                    ],
+                ]);
+            }
+
+            // **For non-client users, only check if the token is valid**
+            return response()->json([
+                'status' => true,
+                'message' => 'User is authenticated',
+                'token_status' => true,
+                'subscription' => new stdClass(),
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid or expired token',
+                'token_status' => false,
+                'subscription' => new stdClass(),
+            ]);
         }
     }
 }

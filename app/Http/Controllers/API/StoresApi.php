@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Helpers\SubscriptionHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Section;
 use App\Models\Store;
 use Illuminate\Http\Request;
 
@@ -12,8 +14,15 @@ class StoresApi extends Controller
 {
     public function getSellersWithStores()
     {
+        $storeIds = SubscriptionHelper::getUserSubscribedStoreIds();
+
+        if ($storeIds instanceof \Illuminate\Http\JsonResponse) {
+            return $storeIds; // Return response if unauthorized or no subscription
+        }
+
         // Fetch stores where the store is online and include related data
-        $stores = Store::where('is_online', 1)
+        $stores = Store::whereIn('id', $storeIds)
+            ->where('is_online', 1)
             ->with(['branches', 'products', 'excludedProducts', 'user'])
             ->get()
             ->groupBy('user_id') // Group by user_id (seller)
@@ -63,8 +72,13 @@ class StoresApi extends Controller
     public function storesWithOffers()
     {
 
-        $storesWithOffers = Store::has('offers')->get();
+        $storeIds = SubscriptionHelper::getUserSubscribedStoreIds();
 
+        if ($storeIds instanceof \Illuminate\Http\JsonResponse) {
+            return $storeIds;
+        }
+
+        $storesWithOffers = Store::whereIn('id', $storeIds)->has('offers')->get();
         return response(['stores with offers' => $storesWithOffers]);
     }
     public function storesWithProducts()
@@ -80,22 +94,38 @@ class StoresApi extends Controller
         $request->validate(['uuid' => 'required']);
         $uuid = $request->uuid;
         $store = Store::where('uuid', $uuid)->first();
-        if ($store) {
-
-            return response(['store' => $store]);
-        } else {
-            return response(['message' => 'store doesn\'t exist']);
+        if (!$store) {
+            return response(['message' => 'Store doesn\'t exist']);
         }
+
+        $storeIds = SubscriptionHelper::getUserSubscribedStoreIds();
+
+        if ($storeIds instanceof \Illuminate\Http\JsonResponse) {
+            return $storeIds;
+        }
+
+        if (!$storeIds->contains($store->id)) {
+            return response(['message' => 'This store is not included in your subscription'], 403);
+        }
+
+        return response(['store' => $store]);
     }
 
     public function mostPopularStores()
     {
-        $stores = Store::where('is_most_popular', 1)->get();
-        if (count($stores) > 0) {
-            return response(['most popular providers' => $stores]);
-        } else {
-            return response(['message' => 'there\'s no most popular providers defined']);
+        $storeIds = SubscriptionHelper::getUserSubscribedStoreIds();
+
+        if ($storeIds instanceof \Illuminate\Http\JsonResponse) {
+            return $storeIds;
         }
+
+        $stores = Store::whereIn('id', $storeIds)->where('is_most_popular', 1)->get();
+
+        if ($stores->isEmpty()) {
+            return response(['message' => 'There are no most popular providers defined']);
+        }
+
+        return response(['most_popular_providers' => $stores]);
     }
 
     public function filterStores(Request $request)
@@ -105,36 +135,36 @@ class StoresApi extends Controller
             'country' => 'required|string',
         ]);
 
-        $stores = Store::where('city', $data['city'])->where('country', $data['country'])->get();
-        if (count($stores) > 0) {
-            return response(['stores' => $stores]);
-        } else {
-            return response(['message' => 'no matched stores']);
+        $storeIds = SubscriptionHelper::getUserSubscribedStoreIds();
+
+        if ($storeIds instanceof \Illuminate\Http\JsonResponse) {
+            return $storeIds;
         }
+
+        $stores = Store::whereIn('id', $storeIds)
+            ->where('city', $data['city'])
+            ->where('country', $data['country'])
+            ->get();
+
+        if ($stores->isEmpty()) {
+            return response(['message' => 'No matched stores']);
+        }
+
+        return response(['stores' => $stores]);
     }
 
-    // public function applyDiscount($storeId)
-    // {
-    //     $store = Store::findOrFail($storeId);
-
-    //     // Assuming 'discount_percentage' is a column in the stores table
-    //     $discount = $store->discount_percentage ? $store->discount_percentage.'%' : '0%';
-
-    //     return response()->json([
-    //         'message' => 'Discount applied successfully!',
-    //         'store_id' => $store->id,
-    //         'discount' => $discount
-    //     ]);
-    // }
-
-    public function showDiscount($uuid)
+    public function getUserSubscribedSections()
     {
-        $store = Store::where('uuid', $uuid)->with('products', 'excludedProducts', 'offers')->firstOrFail();
-        // dd($store);
+        $sections = SubscriptionHelper::getUserSubscribedSections();
+
+        if ($sections instanceof \Illuminate\Http\JsonResponse) {
+            return $sections;
+        }
+
         return response()->json([
-            'message' => 'Store data retrieved successfully!',
-            'store' => $store,
-        ]);
-        // ... rest of your logic
+            'status' => true,
+            'message' => 'User subscribed sections retrieved successfully',
+            'data' => $sections,
+        ], 200);
     }
 }

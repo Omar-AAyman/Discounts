@@ -27,40 +27,43 @@
                         {{ session('fail') }}
                     </div>
                     @endif
+                    <div class="table-responsive">
 
-                    <table id="myTable" class="table small-table-text text-center">
-                        <thead>
-                            <tr style="white-space: nowrap; font-size: 14px;">
+                        <table id="myTable" class="table small-table-text text-center">
+                            <thead>
+                                <tr style="white-space: nowrap; font-size: 14px;">
 
-                                <th>Store Name</th>
-                                <th>Old discount (%)</th>
-                                <th>New requested discount % </th>
-                                <th>Controls</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($changeRequests as $changeRequest)
-                            <tr style="white-space: nowrap; font-size: 14px;">
-                                <td>{{ $changeRequest->store->name }}</td>
-                                <td>{{ $changeRequest->old_discount_percentage }}</td>
-                                <td>{{ $changeRequest->requested_discount_percentage }}</td>
-                                <td>
-                                    <div class="d-flex gap-2 justify-content-center">
-                                        <!-- or use 'me-2' class for specific spacing -->
-                                        <form method="post" action="{{ route('stores.discount.accept', $changeRequest->id) }}">
-                                            @csrf
-                                            <button type="submit" class="btn btn-success btn-xs mx-1">Accept</button>
-                                        </form>
-                                        <form method="post" action="{{ route('stores.discount.reject', $changeRequest->id) }}">
-                                            @csrf
-                                            <button type="submit" class="btn btn-danger btn-xs ">Reject</button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                    <th>Store Name</th>
+                                    <th>Old discount (%)</th>
+                                    <th>New requested discount % </th>
+                                    <th>Controls</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($changeRequests as $changeRequest)
+                                <tr style="white-space: nowrap; font-size: 14px;">
+                                    <td>{{ $changeRequest->store->name }}</td>
+                                    <td>{{ $changeRequest->old_discount_percentage }}</td>
+                                    <td>{{ $changeRequest->requested_discount_percentage }}</td>
+                                    <td>
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <!-- or use 'me-2' class for specific spacing -->
+                                            <form method="post" action="{{ route('stores.discount.accept', $changeRequest->id) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-xs mx-1">Accept</button>
+                                            </form>
+                                            <form method="post" action="{{ route('stores.discount.reject', $changeRequest->id) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger btn-xs ">Reject</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
                 @endif
             </div>

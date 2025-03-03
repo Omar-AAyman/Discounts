@@ -36,6 +36,8 @@ trait FcmNotificationTrait
       'title' => $title,
       'body' => $body,
       'notificationLogId' => $notificationLogId,
+      'type' => $type ?? 'notification type',
+      'status' => $status ?? 'notification status',
       'click_action' => $click_action ?? 'test',
       'sound' => 'default',
       'badge'=> '1',

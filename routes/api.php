@@ -71,22 +71,10 @@ Route::get('/all/packages', [UserSubscription::class, 'getAllPackages']);
 //sections
 Route::get('/all/sections', [SectionsApi::class, 'sections']);
 
-//stores
-Route::get('/all/stores', [StoresApi::class, 'getSellersWithStores']);
-Route::get('/all/stores/with/offers', [StoresApi::class, 'storesWithOffers']);
-Route::get('/all/stores/with/products', [StoresApi::class, 'storesWithProducts']);
-Route::post('/specific/store', [StoresApi::class, 'store']);
-Route::get('/most/popular/stores', [StoresApi::class, 'mostPopularStores']);
-Route::post('/filter/stores', [StoresApi::class, 'filterStores']);
-
-//products
-Route::get('/all/products', [ProductController::class, 'getAllProducts']);
-Route::get('/products/{id}', [ProductController::class, 'getProductDetails']);
 
 
-//offers
-Route::get('/all/offers', [OffersApi::class, 'offers']);
-Route::post('/specific/offer', [OffersApi::class, 'offer']);
+
+
 Route::post('/products/of/offer', [OffersApi::class, 'offerProducts']);
 
 
@@ -109,6 +97,8 @@ Route::get('/application/status', [ApplicationStatusApi::class, 'appStatus']);
 //onBoarding screen
 Route::get('/onBoaring/screen', [OnBoardingScreenApi::class, 'onBoardings']);
 
+Route::get('/check/subscription/status', [SubscriptionController::class, 'checkUserSubscription']);
+
 
 Route::get('/cities/{countryId}', function ($countryId) {
     return City::where('country_id', $countryId)->get(['id', 'name']);
@@ -121,10 +111,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/stores/discount/{uuid}', [StoresApi::class, 'showDiscount'])
     ->name('store.discount');
-    
+
 Route::get('/payment/callback', [SubscriptionController::class, 'callback'])->name('payment.callback');
 
-    // private routes
+// private routes
 Route::group(['middleware' => ['auth:sanctum', 'track_activity']], function () {
 
     Route::post('/logout', [Authentication::class, 'logout']);
@@ -138,15 +128,23 @@ Route::group(['middleware' => ['auth:sanctum', 'track_activity']], function () {
     Route::post('/request/product', [CustomerRequestApi::class, 'requestProduct']);
     Route::get('/unconfirmed/product/requests', [CustomerRequestApi::class, 'unconfirmedPurchaseRequests']);
 
-    // Get Store Current Discount
-    // Route::get('/store/discount/{store}', [StoresApi::class, 'applyDiscount'])->name('store.discount');
 
-    // Payment Routes
-    // Route::prefix('/transaction')->group(function () {
-    //     Route::post('/initialize', [TransactionController::class, 'initialize']);
-    //     Route::get('/status/{transactionId}', [TransactionController::class, 'status']);
-    //     // Add more endpoints as needed
-    // });
+    //offers
+    Route::get('/all/offers', [OffersApi::class, 'offers']);
+    Route::post('/specific/offer', [OffersApi::class, 'offer']);
+
+    //products
+    Route::get('/all/products', [ProductController::class, 'getAllProducts']);
+    Route::get('/products/{id}', [ProductController::class, 'getProductDetails']);
+
+    Route::get('/all/user/sections', [StoresApi::class, 'getUserSubscribedSections']);
+    //stores
+    Route::get('/all/stores', [StoresApi::class, 'getSellersWithStores']);
+    Route::get('/all/stores/with/offers', [StoresApi::class, 'storesWithOffers']);
+    Route::get('/all/stores/with/products', [StoresApi::class, 'storesWithProducts']);
+    Route::post('/specific/store', [StoresApi::class, 'store']);
+    Route::get('/most/popular/stores', [StoresApi::class, 'mostPopularStores']);
+    Route::post('/filter/stores', [StoresApi::class, 'filterStores']);
 
     // Lahza Payment
     Route::post('/subscribe', [SubscriptionController::class, 'initiate']);
@@ -263,6 +261,5 @@ Route::group(['middleware' => ['auth:sanctum', 'track_activity']], function () {
 
         Route::get('/discountRequests/getDiscountRequests', [SellerDiscountController::class, 'getDiscountRequests']);
         Route::post('/discountRequests/markAsPaid/{invoiceId}', [SellerDiscountController::class, 'markAsPaid']);
-
     });
 });

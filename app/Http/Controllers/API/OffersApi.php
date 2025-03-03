@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Helpers\SubscriptionHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Offer;
 use App\Models\OfferNotification;
+use App\Models\Store;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
 
 use function PHPUnit\Framework\isEmpty;
@@ -14,16 +17,35 @@ class OffersApi extends Controller
 
     public function offers()
     {
+        $storeIds = SubscriptionHelper::getUserSubscribedStoreIds();
 
-        $offers = Offer::where('is_online', operator: 1)->with('store.user')->get();
+        if ($storeIds instanceof \Illuminate\Http\JsonResponse) {
+            return $storeIds; // Return response if unauthorized or no subscription
+        }
+
+        // Fetch only offers from subscribed stores
+        $offers = Offer::whereIn('store_id', $storeIds)
+            ->where('is_online', 1)
+            ->with('store.user')
+            ->get();
+
         return response(['offers' => $offers]);
     }
 
     public function offer(Request $request)
     {
         $request->validate(['id' => 'required']);
-        $id = $request->id;
-        $offer = Offer::where('id', $id)->with('store')->first();
+
+        $storeIds = SubscriptionHelper::getUserSubscribedStoreIds();
+
+        if ($storeIds instanceof \Illuminate\Http\JsonResponse) {
+            return $storeIds; // Return response if unauthorized or no subscription
+        }
+        // Fetch the offer only if it belongs to an allowed store
+        $offer = Offer::where('id', $request->id)
+            ->whereIn('store_id', $storeIds)
+            ->with('store')
+            ->first();
         if ($offer) {
             return response(['offer' => $offer]);
         } else {

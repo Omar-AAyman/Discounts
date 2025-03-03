@@ -7,6 +7,7 @@ use App\Models\Package;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class SubscriptionController extends Controller
 {
@@ -31,6 +32,14 @@ class SubscriptionController extends Controller
     public function displayUsersSubscribtions()
     {
         $subscribtions = Subscription::where('type', 'user_subscription')->get();
+
+        // Update expired subscriptions
+        foreach ($subscribtions as $subscribtion) {
+            if ($subscribtion->expires_at < now()) {
+                $subscribtion->update(['is_online' => false]);
+            }
+        }
+
         return view('subscribtions.userSubscribtions', compact('subscribtions'));
     }
 
@@ -134,4 +143,7 @@ class SubscriptionController extends Controller
             return redirect()->back()->with('subscribtionError', 'this user is currently subscribed');
         }
     }
+
+
+    
 }

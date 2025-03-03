@@ -207,7 +207,7 @@ class DelegateController extends Controller
         [$red, $green, $blue] = $color;
 
         // Generate QR content with UUID-based URL
-        $qrContent = $store->uuid;
+        $qrContent = $store->user->seller_type_id.'_'.$store->uuid;
 
         // Generate the QR code with custom color
         $qrCode = QrCode::format('svg')
