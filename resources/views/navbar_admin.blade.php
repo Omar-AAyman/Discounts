@@ -65,7 +65,7 @@
                         <a class="nav-link" href="{{route('stores.showChangeDiscountRequests')}}"><i class="fas fa-exchange-alt"></i> Discount Requests</a>
                     </nav>
                 </div>
-{{--
+
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseInvoices" aria-expanded="false" aria-controls="collapseInvoices">
                     <div class="nav-link-icon"><i class="fas fa-file-invoice"></i></div>
                     Invoices
@@ -73,11 +73,14 @@
                 </a>
                 <div class="collapse" id="collapseInvoices" data-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav accordion">
-                        <a class="nav-link" href="#"><i class="fas fa-list"></i> All Invoices</a>
-                        <a class="nav-link" href="#"><i class="fas fa-plus-circle"></i> New Invoice</a>
+                        <a class="nav-link" href="{{ route('invoices.products') }}">
+                            <i class="fas fa-box"></i> Product Invoices
+                        </a>
+                        <a class="nav-link" href="{{ route('invoices.subscriptions') }}">
+                            <i class="fas fa-receipt"></i> Subscription Invoices
+                        </a>
                     </nav>
                 </div>
---}}
 
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLocations" aria-expanded="false" aria-controls="collapseLocations">
                     <div class="nav-link-icon"><i class="fas fa-map-marked-alt"></i></div>
@@ -100,6 +103,7 @@
                     <nav class="sidenav-menu-nested nav accordion">
                         <a class="nav-link" href="{{route('subscriptions.guestSubscriptions')}}"><i class="fas fa-user-clock"></i> Guests</a>
                         <a class="nav-link" href="{{route('subscriptions.userSubscriptions')}}"><i class="fas fa-user-check"></i> Users</a>
+                        <a class="nav-link" href="{{route('subscriptions.pendingUserSubscriptions')}}"><i class="fas fa-money-bill-wave"></i> Pending Payments</a>
                     </nav>
                 </div>
 
@@ -133,7 +137,7 @@
                 <div class="collapse" id="collapsePanelOptions" data-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav accordion">
                         <a class="nav-link" href="{{route('options.index')}}"><i class="fas fa-list"></i> All Options</a>
-                        <a class="nav-link" href="{{route('options.showImages')}}"><i class="fas fa-image"></i> Images Options</a>
+                        {{-- <a class="nav-link" href="{{route('options.showImages')}}"><i class="fas fa-image"></i> Images Options</a> --}}
                         <a class="nav-link" href="{{route('options.create')}}"><i class="fas fa-plus-circle"></i> New Option</a>
                     </nav>
                 </div>

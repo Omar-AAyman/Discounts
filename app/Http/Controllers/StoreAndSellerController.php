@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Dompdf\Options;
 
 class StoreAndSellerController extends Controller
 {
@@ -283,6 +285,7 @@ class StoreAndSellerController extends Controller
             'store_img' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'country_id' => 'required|exists:countries,id',
             'city_id' => 'required|exists:cities,id',
+            'is_online' => 'required|in:0,1',
         ]);
 
         // Begin transaction
@@ -302,6 +305,7 @@ class StoreAndSellerController extends Controller
                 'instagram' => $validated['instagram'],
                 'city' => $validated['city_id'],
                 'country' => $validated['country_id'],
+                'is_online' => $validated['is_online'],
             ]);
 
             // Update store information
@@ -320,6 +324,7 @@ class StoreAndSellerController extends Controller
                 'phone_number2' => $validated['phone_number2'],
                 'city' => $validated['city_id'],
                 'country' => $validated['country_id'],
+                'is_online' => $validated['is_online'],
             ]);
 
             // Handle image uploads using the existing method
@@ -336,5 +341,33 @@ class StoreAndSellerController extends Controller
                 ->withInput()
                 ->with('error', 'An error occurred while updating the seller. Please try again.');
         }
+    }
+    public function downloadQrPdf($id)
+    {
+        $store = Store::findOrFail($id); // Find store by ID
+
+        if (!$store->sector_qr) {
+            return back()->with('error', 'No QR Code available for this store.');
+        }
+
+        // Construct the full file path
+        $qrCodePath = public_path('images/qrcodes/' . basename($store->sector_qr));
+
+        if (!file_exists($qrCodePath)) {
+            return back()->with('error', 'QR Code file not found.');
+        }
+
+        // Convert image to base64 to embed in the PDF
+        $qrCodeBase64 = 'data:image/svg+xml;base64,' . base64_encode(file_get_contents($qrCodePath));
+
+         // Set DomPDF options to support Arabic fonts
+        $options = new Options();
+        $options->set('defaultFont', 'dejavusans');
+
+        // Load the PDF view
+        $pdf = Pdf::loadView('store-and-seller.single-qr-pdf', compact('store', 'qrCodeBase64'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download("store-qr-{$store->id}.pdf");
     }
 }

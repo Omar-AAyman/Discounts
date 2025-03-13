@@ -473,14 +473,16 @@ class DelegateControllerApi extends Controller
             ->where('delegate_id', auth()->id())
             ->firstOrFail();
 
+        $userLang = auth()->user()->lang ?? 'ar';
+
         if ($store->status === 'delete_requested') {
-            return back()->with('info', 'Deletion request already submitted.');
+            return back()->with('info', __('messages.store_delete_requested', [], $userLang));
         }
 
         $store->status = 'delete_requested';
         $store->save();
 
-        return back()->with('success', 'Store deletion request submitted successfully.');
+        return back()->with('success',  __('messages.store_delete_success', [], $userLang));
     }
 
 
@@ -499,7 +501,7 @@ class DelegateControllerApi extends Controller
         $store = Store::where('user_id', $sellerId)
             ->where('delegate_id', auth()->id())
             ->firstOrFail();
-
+        $lang = $seller->lang ?? 'ar';
         // Check if seller and store exist
         if (!$seller || !$store) {
             return response()->json([
@@ -510,7 +512,7 @@ class DelegateControllerApi extends Controller
         if ($store->status === 'delete_requested') {
             return response()->json([
                 'status' => false,
-                'message' => 'Deletion request already submitted.',
+                'message' => __('messages.store_delete_requested', [], $lang),
             ]);
         }
 
@@ -520,7 +522,7 @@ class DelegateControllerApi extends Controller
         // Return success response
         return response()->json([
             'status' => true,
-            'message' => 'Store deletion request submitted successfully.',
+            'message' => __('messages.store_delete_success', [], $lang),
         ]);
     }
 }

@@ -46,11 +46,11 @@
                                         <div class="d-flex gap-2 justify-content-center">
                                             <form method="post" action="{{ route('stores.processDeleteRequest', $store->id) }}">
                                                 @csrf
-                                                <button type="submit" name="action" value="approve" class="btn btn-success btn-xs mx-1">✅ Approve</button>
+                                                <button type="submit" name="action" value="approve" class="btn btn-success btn-xs mx-1">Approve</button>
                                             </form>
                                             <form method="post" action="{{ route('stores.processDeleteRequest', $store->id) }}">
                                                 @csrf
-                                                <button type="submit" name="action" value="reject" class="btn btn-danger btn-xs">❌ Reject</button>
+                                                <button type="submit" name="action" value="reject" class="btn btn-danger btn-xs">Reject</button>
                                             </form>
                                         </div>
                                     </td>

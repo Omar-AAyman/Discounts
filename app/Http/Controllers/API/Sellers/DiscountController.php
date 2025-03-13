@@ -78,8 +78,8 @@ class DiscountController extends Controller
         });
 
         // Separate pending and paid invoices
-        $pending = $invoices->where('status', 'pending')->values();
-        $paid = $invoices->where('status', 'paid')->values();
+        $pending = $invoices->where('status', 'pending')->sortByDesc('created_at')->values();
+        $paid = $invoices->where('status', 'paid')->sortByDesc('created_at')->values();
 
         // Calculate total amounts (Master Totals)
         $totalBeforeDiscount = $invoices->sum('amount');
@@ -168,6 +168,8 @@ class DiscountController extends Controller
 
         // Mark the invoice as paid
         $invoice->update(['status' => 'paid']);
+        $store->increment('points'); // Add 1 point to the store
+        $user->increment('points');
 
         // Prepare notification details
         $notificationDetails = [
@@ -185,6 +187,58 @@ class DiscountController extends Controller
             'success' => true,
             'message' => 'Invoice marked as paid successfully and notification sent.',
             'data' => $invoice
+        ], 200);
+    }
+
+
+    public function markAllAsPaid(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized.',
+                'data' => null
+            ], 200);
+        }
+
+        // Get the store associated with the seller
+        $store = $user->store; // Assuming there is a relation in User model
+
+        if (!$store) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Store not found.',
+                'data' => null
+            ], 200);
+        }
+
+        // Count the number of pending invoices
+        $pendingInvoices = Invoice::where('store_id', $store->id)
+            ->where('status', 'pending')
+            ->count();
+
+        if ($pendingInvoices === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No pending invoices found for this seller.',
+                'data' => null
+            ], 200);
+        }
+        // Update all pending invoices as paid
+        Invoice::where('store_id', $store->id)
+            ->where('status', 'pending')
+            ->update(['status' => 'paid']);
+
+        // Increment store points based on the number of approved invoices
+        $store->increment('points', $pendingInvoices);
+        $user->increment('points', $pendingInvoices);
+
+        return response()->json([
+            'success' => true,
+            'message' => "$pendingInvoices invoices marked as paid successfully, and store points updated.",
+            'data' => null
         ], 200);
     }
 }

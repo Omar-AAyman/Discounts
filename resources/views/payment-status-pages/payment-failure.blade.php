@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Failed - Wallet Deals</title>
+    <title>فشل الدفع - Wallet Deals</title>
     <link rel="icon" href="{{ asset('assets/hero.png') }}" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
@@ -26,6 +26,7 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
+            text-align: right;
         }
 
         .main-container {
@@ -112,8 +113,8 @@
                     <div class="failure-image-container">
                         <i class="fas fa-times-circle" style="font-size: 6rem; color: var(--redColor);"></i>
                     </div>
-                    <h1 class="status-title">Payment Failed</h1>
-                    <p class="status-message">There was an issue processing your payment. Please try again.</p>
+                    <h1 class="status-title">فشلت عملية الدفع</h1>
+                    <p class="status-message">حدثت مشكلة أثناء معالجة الدفع. يرجى المحاولة مرة أخرى.</p>
                 </div>
             </div>
         </div>
@@ -122,9 +123,9 @@
     <footer class="footer text-center">
         <div class="container">
             <a href="https://walldeals.online/" target="_blank">
-                <img src="{{ asset('assets/hero.png') }}" alt="Wallet Deals Logo" class="footer-logo">
+                <img src="{{ asset('assets/hero.png') }}" alt="شعار Wallet Deals" class="footer-logo">
             </a>
-            <p class="footer-text mb-0">Wallet Deals - Your Ultimate Savings Companion.</p>
+            <p class="footer-text mb-0">Wallet Deals - رفيقك المثالي في التوفير.</p>
         </div>
     </footer>
 

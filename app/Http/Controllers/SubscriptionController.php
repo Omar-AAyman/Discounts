@@ -31,7 +31,9 @@ class SubscriptionController extends Controller
 
     public function displayUsersSubscribtions()
     {
-        $subscribtions = Subscription::where('type', 'user_subscription')->get();
+        $subscribtions = Subscription::where('type', 'user_subscription')
+            ->whereIn('status', ['paid', 'manually'])
+            ->orderBy('created_at', 'desc')->get();
 
         // Update expired subscriptions
         foreach ($subscribtions as $subscribtion) {
@@ -42,7 +44,21 @@ class SubscriptionController extends Controller
 
         return view('subscribtions.userSubscribtions', compact('subscribtions'));
     }
+    public function displayPendingUsersSubscribtions()
+    {
+        $subscribtions = Subscription::where('type', 'user_subscription')
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')->get();
 
+        // Update expired subscriptions
+        foreach ($subscribtions as $subscribtion) {
+            if ($subscribtion->expires_at < now()) {
+                $subscribtion->update(['is_online' => false]);
+            }
+        }
+
+        return view('subscribtions.pendingUserSubscribtions', compact('subscribtions'));
+    }
     // display view for subscribe a guest
     public function showSubscribeGuest()
     {
@@ -115,18 +131,32 @@ class SubscriptionController extends Controller
     // customer/user subscription
     public function userSubscription(Request $request)
     {
-        $request->validate(['user_id' => 'required', 'package_id' => 'required', 'period_in_months' => 'required']);
+        $request->validate([
+            'user_id' => 'required',
+            'package_id' => 'required',
+            'period_in_months' => 'required'
+        ]);
+
         $userId = $request->input('user_id');
         $user = User::findOrFail($userId);
-
         $packageId = $request->input('package_id');
-
         $package = Package::findOrFail($packageId);
 
+        // Check for an active guest subscription and deactivate it
+        $guestSubscription = Subscription::where('user_id', $user->id)
+            ->where('type', 'guest_subscription')
+            ->where('is_online', 1)
+            ->first();
+
+        if ($guestSubscription) {
+            $guestSubscription->update(['is_online' => 0]);
+        }
+
+        // Check if user already has an active user subscription
         $userSubscription = Subscription::where('user_id', $user->id)
             ->where('type', 'user_subscription')
-            ->where('is_online', 1)->first();
-
+            ->where('is_online', 1)
+            ->first();
 
         if (!$userSubscription) {
             Subscription::create([
@@ -140,10 +170,7 @@ class SubscriptionController extends Controller
 
             return redirect()->route('subscriptions.userSubscriptions');
         } else {
-            return redirect()->back()->with('subscribtionError', 'this user is currently subscribed');
+            return redirect()->back()->with('subscriptionError', 'This user is currently subscribed.');
         }
     }
-
-
-    
 }

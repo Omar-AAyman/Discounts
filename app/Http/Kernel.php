@@ -68,5 +68,6 @@ class Kernel extends HttpKernel
         'is_seller' => \App\Http\Middleware\IsSeller::class,
         'admin_or_cs' => \App\Http\Middleware\AdminOrCustomerSupport::class,
         'track_activity' => \App\Http\Middleware\TrackUserActivity::class,
+        'checkUserStatus' => \App\Http\Middleware\CheckUserStatus::class,
     ];
 }

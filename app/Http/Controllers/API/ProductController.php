@@ -20,7 +20,12 @@ class ProductController extends Controller
         // Fetch all products with their related store, filtering out products without a store
         $products = Product::with(['store.user'])
             ->whereIn('store_id', $storeIds)
-            ->has('store')
+            ->whereNull('offer_id')
+            ->where('is_excluded_from_discount', 0)
+            ->whereHas('store', function ($query) {
+                $query->where('is_online', 1)
+                ->where('status', '!=', 'pending');
+            })
             ->get();
 
         return response()->json([
@@ -41,7 +46,10 @@ class ProductController extends Controller
         $product = Product::with('store')
             ->where('id', $id)
             ->whereIn('store_id', $storeIds)
-            ->has('store')
+            ->whereHas('store', function ($query) {
+                $query->where('is_online', 1)
+                ->where('status', '!=', 'pending');
+            })
             ->first();
 
         if (!$product) {

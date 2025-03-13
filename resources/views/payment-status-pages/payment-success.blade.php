@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful - Wallet Deals</title>
+    <title>عملية الدفع ناجحة - Wallet Deals</title>
     <link rel="icon" href="{{ asset('assets/hero.png') }}" type="image/x-icon">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -28,6 +28,7 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
+            text-align: right;
         }
 
         .main-container {
@@ -114,8 +115,8 @@
                     <div class="success-image-container">
                         <i class="fas fa-check-circle" style="font-size: 6rem; color: var(--pinkColor);"></i>
                     </div>
-                    <h1 class="status-title">Payment Successful!</h1>
-                    <p class="status-message">Your payment has been processed successfully. You can now use the app!</p>
+                    <h1 class="status-title">تمت عملية الدفع بنجاح!</h1>
+                    <p class="status-message">تمت معالجة دفعتك بنجاح. يمكنك الآن استخدام التطبيق!</p>
                 </div>
             </div>
         </div>
@@ -124,9 +125,9 @@
     <footer class="footer text-center">
         <div class="container">
             <a href="https://walldeals.online/" target="_blank">
-                <img src="{{ asset('assets/hero.png') }}" alt="Wallet Deals Logo" class="footer-logo">
+                <img src="{{ asset('assets/hero.png') }}" alt="شعار Wallet Deals" class="footer-logo">
             </a>
-            <p class="footer-text mb-0">Wallet Deals - Your Ultimate Savings Companion.</p>
+            <p class="footer-text mb-0">Wallet Deals - رفيقك المثالي في التوفير.</p>
         </div>
     </footer>
 

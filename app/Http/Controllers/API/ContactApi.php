@@ -20,9 +20,9 @@ class ContactApi extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
-
+        $lang = $user->lang ?? 'ar';
         if (!$user) {
-            return response(['status' => false, 'message' => 'User doesn\'t exist'], 200);
+            return response(['status' => false, 'message' => __('messages.user_not_found', [], $lang)], 200);
         }
 
         // Check if the user has any open or in-progress tickets
@@ -31,18 +31,18 @@ class ContactApi extends Controller
             ->exists();
 
         if ($hasOpenTicket) {
-            return response(['status' => false, 'message' => 'You already have an open or in-progress ticket. Please resolve it before opening a new one.'], 200);
+            return response(['status' => false, 'message' => __('messages.ticket_already_open', [], $lang)], 200);
         }
 
         // Create a new ticket
         Ticket::create([
-            'title' => 'Contact Message',
+            'title' => __('messages.contact_message', [], $lang),
             'user_id' => $user->id,
             'body' => $request->message,
             'status' => 'open',
         ]);
 
-        return response(['status' => true, 'message' => 'Message was sent to Wallet Deals admins'], 200);
+        return response(['status' => true, 'message' => __('messages.message_sent', [], $lang)], 200);
     }
 
     /**
@@ -64,12 +64,14 @@ class ContactApi extends Controller
     public function showUserTicket(Request $request, $id)
     {
         $user = auth()->user();
+        $lang = $user->lang ?? 'ar';
+
         $ticket = Ticket::where('id', $id)->where('user_id', $user->id)->with('responses')->first();
 
         if (!$ticket) {
-            return response(['status'=>true ,'message' => 'Ticket not found or unauthorized'], 200);
+            return response(['status'=>true ,'message' => __('messages.ticket_not_found', [], $lang)], 200);
         }
 
-        return response(['status'=>true ,'data' => $ticket],200);
+        return response(['status'=>true ,'message' => __('messages.ticket_retrieved', [], $lang),'data' => $ticket],200);
     }
 }

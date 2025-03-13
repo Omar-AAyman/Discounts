@@ -28,6 +28,7 @@ class Authentication extends Controller
             'password' => 'required|string|confirmed',
             'phone' => 'required|unique:users,phone',
             'country' => 'required',
+            'city'    => 'required',
             'type' => 'required',
             'img' => 'nullable|mimes:jpg,png,jpeg,gif,svg',
         ]);
@@ -39,6 +40,7 @@ class Authentication extends Controller
             'password'   => Hash::make($data['password']), // securely hash the password
             'phone'      => $data['phone'],
             'country'    => $data['country'],
+            'city'    => $data['city'],
             'type'       => $data['type'],
         ]);
 
@@ -72,7 +74,7 @@ class Authentication extends Controller
 
         return response([
             "status" => true,
-            "message" => "OTP code has been sent to the email account",
+            "message" => __('messages.otp_sent', [], 'ar'),
         ], 200);
     }
 
@@ -85,21 +87,42 @@ class Authentication extends Controller
             'fcm_token' => 'required|string',
         ]);
 
+        // Find the user before authentication
+        $user = User::where('email', $request->email)->first();
+
+        // Case 1: User does not exist
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => __('messages.user_not_found', [], 'ar'),
+            ], 200);
+        }
+
+        // Case 2: User is deactivated
+        if ($user->is_online == 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => __('messages.account_deactivated', [], $user->lang ?? 'ar'),
+            ], 200);
+        }
+
+
         // Attempt to authenticate the user
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = User::where('email', $request->email)->first();
+            $lang = $user->lang ?? 'ar';
 
             // dd($user->stores[0]->status);
             $sellerStatus = null;
             if ($user->type == 'seller') {
                 $sellerStatus = $user->stores[0] ? $user->stores[0]->status : null;
 
-                if ($sellerStatus == 'pending'){
+                if ($sellerStatus == 'pending') {
 
                     // Return success response with user and token
                     return response()->json([
                         'status' => 'error', // Added status
-                        'message' => 'Your store is still pending approval. Please wait for it to be approved.',
+                        'message' => __('messages.store_pending', [], $lang),
                         'token' => null,
                         'user_type' =>  null,
                         'seller_type_id' =>  null,
@@ -128,23 +151,14 @@ class Authentication extends Controller
             // Set Expiration Time (e.g., 30 days)
             $token->accessToken->expires_at = now()->addDays(30);
             $token->accessToken->save();
-
-            if ($lastSubscription) {
-                $expiryDate = \Carbon\Carbon::parse($lastSubscription->created_at);
-
-                if ($lastSubscription->type === 'guest_subscription') {
-                    $expiryDate->addDays(7);
-                } else {
-                    $expiryDate->addMonths($lastSubscription->period_in_months);
-                }
-
-                $lastSubscription->expiry_date = $expiryDate->format('Y-m-d');
+            if ($lastSubscription && (!$lastSubscription->is_online || now()->greaterThan($lastSubscription->expires_at))) {
+                $lastSubscription->update(['is_online' => false]); // Mark as inactive if expired
             }
 
             // Return success response with user and token
             return response()->json([
                 'status' => 'success', // Added status
-                'message' => 'Login successful',
+                'message' => __('messages.login_success', [], $lang),
                 'token' => $token->plainTextToken,
                 'user_type' => $user->type,
                 'seller_type_id' => $user->seller_type_id,
@@ -160,23 +174,27 @@ class Authentication extends Controller
         // If authentication fails
         return response()->json([
             'status' => 'error',
-            'message' => 'Invalid email or password',
+            'message' => __('messages.invalid_credentials', [], 'ar'),
         ], 200);
     }
 
     public function logout(Request $request)
     {
+        $user = $request->user();
+        $lang = $user->lang ?? 'ar';
+
         if (!PersonalAccessToken::findToken($request->bearerToken())->isExpired()) {
             $request->user()->tokens()->delete();
 
+
             return response()->json([
                 'status' => true,
-                'message' => 'Logged out'
+                'message' => __('messages.logout_success', [], $lang),
             ], 200);
         } else {
             return response()->json([
                 'status' => false,
-                'message' => 'Token is expired'
+                'message' => __('messages.token_expired', [], $lang),
             ], 200);
         }
     }
@@ -191,6 +209,7 @@ class Authentication extends Controller
 
         ]);
         $user = User::where('email', $request->email)->first();
+        $lang = $user->lang ?? 'ar';
 
 
         if ($user) {
@@ -207,10 +226,13 @@ class Authentication extends Controller
 
             return response()->json([
                 "status" => true,
-                "message" => "OTP code has been sent to the email account",
+                "message" => __('messages.otp_sent', [], $lang),
             ], 200);
         } else {
-            return response()->json(['status' => false, 'message' => 'User doesn\'t exist'], 200);
+            return response()->json([
+                'status' => false,
+                'message' => __('messages.user_not_found', [], $lang),
+            ], 200);
         }
     }
 }

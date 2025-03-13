@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -35,6 +36,10 @@ class Invoice extends Model
         return $query->where('status', 'paid')
         ->where('type', 'product')
         ->with('product');
+    }
+    public function getLastActivityAttribute($value)
+    {
+        return Carbon::parse($value)->addHours(2);
     }
 
 }

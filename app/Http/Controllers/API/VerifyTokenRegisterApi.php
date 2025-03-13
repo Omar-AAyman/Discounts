@@ -43,6 +43,7 @@ class VerifyTokenRegisterApi extends Controller
                 $user->password = $sessionUser['password'];
                 $user->phone = $sessionUser['phone'];
                 $user->country = $sessionUser['country'];
+                $user->city = $sessionUser['city'];
                 $user->type = $sessionUser['type'];
 
 
@@ -54,22 +55,23 @@ class VerifyTokenRegisterApi extends Controller
                 // Delete the OTP record after successful activation
                 $verifyToken->delete();
 
+                $lang = $user->lang ?? 'ar';
 
 
                 return response([
                     'status' => 'success',
-                    'message' => 'OTP verified successfully, your account is activated now',
+                    'message' => __('messages.otp_verified', [], $lang),
                 ]);
             } else {
                 return response([
                     'status' => 'error',
-                    'message' => ' email mismatch. Please register again.',
+                    'message' => __('messages.email_mismatch', [], 'ar'), // Default to Arabic
                 ]);
             }
         } else {
             return response([
                 'status' => 'error',
-                'message' => 'Invalid OTP code. Please try again.',
+                'message' => __('messages.invalid_otp', [], 'ar'), // Default to Arabic
             ]);
         }
     }

@@ -261,5 +261,7 @@ Route::group(['middleware' => ['auth:sanctum', 'track_activity']], function () {
 
         Route::get('/discountRequests/getDiscountRequests', [SellerDiscountController::class, 'getDiscountRequests']);
         Route::post('/discountRequests/markAsPaid/{invoiceId}', [SellerDiscountController::class, 'markAsPaid']);
+        Route::post('/discountRequests/mark-all-paid', [SellerDiscountController::class, 'markAllAsPaid'])->name('invoices.markAllAsPaid');
+
     });
 });

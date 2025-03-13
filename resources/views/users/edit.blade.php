@@ -104,13 +104,40 @@
                             <input id="instagram" value="{{$user->instagram}}" type="string" class="form-control" name="instagram">
 
                         </div>
+                    </div>
 
 
-                        <div class="row gx-3 my-2">
-                            <div class="col-md-6">
-                                <button type="submit" class="btn btn-primary btn-sm">Update</button>
-                            </div>
+                    <!-- New Country/City dropdown row -->
+                    <div class="row gx-4 mb-4">
+                        <!-- Country dropdown -->
+                        <div class="col-md-6">
+                            <label class="small mb-2" for="country">City <span style="color: red;">*</span></label>
+                            <select name="country" id="country" class="form-control form-select" required>
+                                <option value="">Select City</option>
+                                @foreach($countries as $country)
+                                <option value="{{ $country->id }}" {{ old('country',$user->country) == $country->id ? 'selected' : '' }}>
+                                    {{ $country->name }}
+                                </option>
+                                @endforeach
+                            </select>
                         </div>
+
+                        <!-- City dropdown -->
+                        <div class="col-md-6">
+                            <label class="small mb-2" for="city">Area <span style="color: red;">*</span></label>
+                            <select name="city" id="city" class="form-control form-select" required>
+                                <option value="">Select Area</option>
+                            </select>
+                            @error('city')
+                            <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="row gx-3 my-3">
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                        </div>
+                    </div>
                 </form>
 
             </div>
@@ -119,4 +146,37 @@
 </main>
 
 
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const countrySelect = document.getElementById('country');
+        const citySelect = document.getElementById('city');
+        const oldCityId = @json(old('city', $user -> city));
+
+        function fetchCities(countryId, selectedCityId = null) {
+            citySelect.innerHTML = '<option value="">Select City</option>'; // Reset cities
+            if (countryId) {
+                fetch(`/api/cities/${countryId}`)
+                    .then(response => response.json())
+                    .then(cities => {
+                        cities.forEach(city => {
+                            const option = new Option(city.name, city.id, false, city.id == selectedCityId);
+                            citySelect.add(option);
+                        });
+                    });
+            }
+        }
+
+        // Fetch cities on country change
+        countrySelect.addEventListener('change', function() {
+            fetchCities(this.value);
+        });
+
+        // Load cities for preselected country
+        if (countrySelect.value) {
+            fetchCities(countrySelect.value, oldCityId);
+        }
+    });
+
+</script>
 @endsection

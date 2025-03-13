@@ -23,6 +23,7 @@ class StoresApi extends Controller
         // Fetch stores where the store is online and include related data
         $stores = Store::whereIn('id', $storeIds)
             ->where('is_online', 1)
+            ->where('status', '!=', 'pending')
             ->with(['branches', 'products', 'excludedProducts', 'user'])
             ->get()
             ->groupBy('user_id') // Group by user_id (seller)

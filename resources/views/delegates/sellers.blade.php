@@ -34,67 +34,98 @@
             </div>
             @else
             <div class="card-body">
-                <table id="myTable" class="table table-bordered table-hover small-table-text">
-                    <thead>
-                        <tr style="white-space: nowrap; font-size: 14px;">
-                            <th>Seller Info</th>
-                            <th>Store Info</th>
-                            <th>Contact Details</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($sellers as $seller)
-                        <tr style="white-space: nowrap; font-size: 14px;">
-                            <td>
-                                <strong>Name:</strong> {{ $seller['seller']->first_name }} {{ $seller['seller']->last_name }}<br>
-                                <strong>ID:</strong> {{ $seller['seller']->id }}</span><br>
-                                <strong>Type:</strong> <span class="text-primary">{{ ucfirst($seller['seller']->seller_type_id) }}</span><br>
-                                <strong>Created:</strong> <span class="text-primary">{{ \Carbon\Carbon::parse($seller['seller']->created_at)->format('Y-m-d') }}</span>
-                            </td>
-                            <td>
-                                <strong>Store:</strong> {{ $seller['store']->name ?? 'N/A' }}<br>
-                                <strong>City:</strong> {{ $seller['store']->cityRelation->name ?? 'N/A' }}<br>
-                                <strong>Country:</strong> {{ $seller['store']->countryRelation->name ?? 'N/A' }}<br>
-                                <strong>Work Hours:</strong> {{ $seller['store']->work_hours ?? 'N/A' }}
-                            </td>
-                            <td>
-                                <strong>Email:</strong> {{ $seller['seller']->email }}<br>
-                                <strong>Phone:</strong> {{ $seller['seller']->phone }}<br>
-                                @if($seller['store']->phone_number2)
-                                <strong>Whatsapp:</strong> {{ $seller['store']->phone_number2 }}
-                                @endif
-                            </td>
-                            <td>
-                                <span class="badge text-white {{ $seller['store']->status === 'approved' ? 'bg-success' : 'bg-warning' }}">
-                                    {{ ucfirst($seller['store']->status) }}
-                                </span>
-                                <br>
-                                <span class="badge text-white {{ $seller['seller']->is_online ? 'bg-success' : 'bg-secondary' }}">
-                                    {{ $seller['seller']->is_online ? 'Online' : 'Offline' }}
-                                </span>
-                            </td>
-                            <td>
-                                <a href="{{ route('delegates.editSeller', ['seller' => $seller['seller']]) }}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-edit"></i> Edit Seller
-                                </a>
+                <div class="table-responsive">
+                    <table id="myTable" class="table table-bordered table-hover small-table-text">
+                        <thead>
+                            <tr style="white-space: nowrap; font-size: 14px;">
+                                <th>Store Image</th>
+                                <th>Store QR</th>
+                                <th>Seller Info</th>
+                                <th>Store Info</th>
+                                <th>Contact Details</th>
+                                <th>Contract</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($sellers as $seller)
+                            <tr style="white-space: nowrap; font-size: 14px;">
+                                <td>
+                                    <img src="{{ $seller['store'] && $seller['store']->store_img ? $seller['store']->store_img : asset('images/default-store.png') }}" alt="Store Image" class="img-thumbnail image">
+                                </td>
+                                <td>
+                                    @if ($seller['store'] && $seller['store']->sector_qr)
+                                    <a href="{{ route('delegates.qr-pdf', ['id' => $seller['store']->id]) }}" target="_blank">
+                                        <img src="{{ $seller['store'] && $seller['store']->sector_qr ? $seller['store']->sector_qr : asset('images/default-store.png') }}" alt="QR Code" class="img-thumbnail image">
+                                    </a>
+                                    @else
+                                    <span class="text-muted">No QR Code</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <strong>Name:</strong> {{ $seller['seller']->first_name }} {{ $seller['seller']->last_name }}<br>
+                                    <strong>ID:</strong> {{ $seller['seller']->id }}</span><br>
+                                    <strong>Type:</strong> <span class="text-primary">{{ ucfirst($seller['seller']->seller_type_id) }}</span><br>
+                                    <strong>Created:</strong> <span class="text-primary">{{ \Carbon\Carbon::parse($seller['seller']->created_at)->format('Y-m-d') }}</span>
+                                </td>
+                                <td>
+                                    <strong>Store:</strong> {{ $seller['store']->name ?? 'N/A' }}<br>
+                                    <strong>City:</strong> {{ $seller['store']->cityRelation->name ?? 'N/A' }}<br>
+                                    <strong>Country:</strong> {{ $seller['store']->countryRelation->name ?? 'N/A' }}<br>
+                                    <strong>Work Hours:</strong> {{ $seller['store']->work_hours ?? 'N/A' }}
+                                </td>
+                                <td>
+                                    <strong>Email:</strong> {{ $seller['seller']->email }}<br>
+                                    <strong>Phone:</strong> {{ $seller['seller']->phone }}<br>
+                                    @if($seller['store']->phone_number2)
+                                    <strong>Whatsapp:</strong> {{ $seller['store']->phone_number2 }}
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($seller['store'] && $seller['store']->contract_img)
+                                    @php $fileExtension = pathinfo($seller['store']->contract_img, PATHINFO_EXTENSION); @endphp
+                                    @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                    <a href="{{ $seller['store']->contract_img }}" target="_blank" class="btn btn-info btn-sm">Preview</a>
+                                    @elseif ($fileExtension === 'pdf')
+                                    <a href="{{ $seller['store']->contract_img }}" target="_blank" class="btn btn-info btn-sm">View PDF</a>
+                                    @endif
+                                    <a href="{{ $seller['store']->contract_img }}" download class="btn btn-primary btn-sm">Download</a>
+                                    @else
+                                    <span class="text-muted">No Contract</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="badge text-white {{ $seller['store']->status === 'approved' ? 'bg-success' : 'bg-warning' }}">
+                                        {{ ucfirst($seller['store']->status) }}
+                                    </span>
+                                    <br>
+                                    <span class="badge text-white {{ $seller['seller']->is_online ? 'bg-success' : 'bg-secondary' }}">
+                                        {{ $seller['seller']->is_online ? 'Online' : 'Offline' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ route('delegates.editSeller', ['seller' => $seller['seller']]) }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit"></i> Edit Seller
+                                    </a>
 
-                                @if($seller['store']->status !== 'delete_requested')
-                                <form action="{{ route('delegates.requestDelete', ['store' => $seller['store']->id]) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to request deletion for this store?');">
-                                    @csrf
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash"></i> Request Delete
-                                    </button>
-                                </form>
-                                @else
-                                <span class="badge bg-warning p-2 text-white"><i class="fas fa-clock"></i>Deletion Requested</span>
-                                @endif
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                    @if($seller['store']->status !== 'delete_requested')
+                                    <form action="{{ route('delegates.requestDelete', ['store' => $seller['store']->id]) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to request deletion for this store?');">
+                                        @csrf
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash"></i> Request Delete
+                                        </button>
+                                    </form>
+                                    @else
+                                    <span class="badge bg-warning p-2 text-white"><i class="fas fa-clock"></i>Deletion Requested</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
             @endif
 

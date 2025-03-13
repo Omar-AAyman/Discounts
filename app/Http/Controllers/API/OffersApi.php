@@ -26,8 +26,25 @@ class OffersApi extends Controller
         // Fetch only offers from subscribed stores
         $offers = Offer::whereIn('store_id', $storeIds)
             ->where('is_online', 1)
+            ->whereHas('store', function ($query) {
+                $query->where('is_online', 1)
+                      ->where('status', '!=', 'pending'); // استبعاد المتاجر التي حالتها "pending"
+            })
             ->with('store.user')
-            ->get();
+            ->get()
+            ->map(function ($offer) {
+                // Calculate discount percentage if missing
+                if ($offer->discount_percentage !== null) {
+                    $offer->computed_discount = $offer->discount_percentage;
+                } elseif ($offer->discount_amount !== null && $offer->price_before_discount > 0) {
+                    $offer->computed_discount = ($offer->discount_amount / $offer->price_before_discount) * 100;
+                } else {
+                    $offer->computed_discount = 0; // No discount available
+                }
+                return $offer;
+            })
+            ->sortByDesc('computed_discount') // Sort by computed discount percentage (highest first)
+            ->values(); // Reset array keys
 
         return response(['offers' => $offers]);
     }

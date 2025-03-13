@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Str;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 class DelegateController extends Controller
 {
 
@@ -377,5 +377,28 @@ class DelegateController extends Controller
 
         return back()->with('success', 'Store deletion request submitted successfully.');
     }
+    public function downloadQrPdf($id)
+    {
+        $store = Store::findOrFail($id); // Find store by ID
 
+        if (!$store->sector_qr) {
+            return back()->with('error', 'No QR Code available for this store.');
+        }
+
+        // Construct the full file path
+        $qrCodePath = public_path('images/qrcodes/' . basename($store->sector_qr));
+
+        if (!file_exists($qrCodePath)) {
+            return back()->with('error', 'QR Code file not found.');
+        }
+
+        // Convert image to base64 to embed in the PDF
+        $qrCodeBase64 = 'data:image/svg+xml;base64,' . base64_encode(file_get_contents($qrCodePath));
+
+        // Load the PDF view
+        $pdf = Pdf::loadView('store-and-seller.single-qr-pdf', compact('store', 'qrCodeBase64'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download("store-qr-{$store->id}.pdf");
+    }
 }

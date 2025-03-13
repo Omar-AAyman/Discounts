@@ -93,6 +93,9 @@ class DiscountController extends Controller
                 'type' => 'products',
             ]);
 
+            // **Increment user points by 1**
+            $user->increment('points');
+
             DB::commit();
             // Prepare notification details
             $notificationDetails = [
@@ -174,8 +177,8 @@ class DiscountController extends Controller
             ];
         });
         // Separate pending and paid invoices
-        $pending = $invoices->where('status', 'pending')->values();
-        $paid = $invoices->where('status', 'paid')->values();
+        $pending = $invoices->where('status', 'pending')->sortByDesc('created_at')->values();
+        $paid = $invoices->where('status', 'paid')->sortByDesc('created_at')->values();
 
         // Calculate total amounts (Master Totals)
         $totalBeforeDiscount = $invoices->sum('amount');

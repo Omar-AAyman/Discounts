@@ -1,6 +1,24 @@
 @extends('layout')
 @section('title', 'Edit Seller')
+@section('styles')
 
+<!-- Custom CSS -->
+<style>
+    /* Default (Offline - Red) */
+    .switch-toggle {
+        background-color: #dc3545 !important;
+        /* Bootstrap Danger (Red) */
+        border-color: #dc3545 !important;
+    }
+
+    /* When Checked (Online - Green) */
+    .switch-toggle:checked {
+        background-color: #28a745 !important;
+        /* Bootstrap Success (Green) */
+        border-color: #28a745 !important;
+    }
+
+</style>
 @section('content')
 <main>
     <!-- Main page content-->
@@ -88,8 +106,16 @@
                         </div>
                     </div>
 
-                    <div class="card-header bg-light p-2 mb-4">
+                    <div class="card-header bg-light p-2 mb-4 d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Store Information</h5>
+
+
+                        <div class="form-check form-switch">
+                            <!-- Hidden Input to Send 0 if Unchecked -->
+                            <input type="hidden" name="is_online" value="0">
+                            <input class="form-check-input switch-toggle" type="checkbox" role="switch" id="is_online" name="is_online" value="1" {{ $seller->store->is_online ? 'checked' : '' }}>
+                            <label class="form-check-label ms-2" for="is_online">Online</label>
+                        </div>
                     </div>
 
                     <div class="row gx-4 mb-4">
@@ -158,7 +184,6 @@
                             @enderror
                         </div>
                     </div>
-
                     <div class="row gx-4 mb-4">
                         <div class="col-md-6">
                             <label class="small mb-2">Working days <span style="color: red;">*</span></label>
@@ -253,7 +278,18 @@
                             </div>
                         </div>
                     </div>
-
+                    <div class="mb-3 ">
+                        <label class="form-label">Store QR Code</label>
+                        <div>
+                            @if ($seller->store && $seller->store->sector_qr)
+                            <a href="{{ route('store-and-seller.qr-pdf', ['id' => $seller->store->id]) }}" target="_blank">
+                                <img src="{{ $seller->store->sector_qr }}" alt="QR Code" class="img-fluid" style="width: 250px; height: 250px;">
+                            </a>
+                            @else
+                            <span class="text-muted">No QR Code</span>
+                            @endif
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary px-4 py-2">Update Seller</button>

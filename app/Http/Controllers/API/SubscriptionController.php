@@ -33,6 +33,7 @@ class SubscriptionController extends Controller
         }
 
         $user = auth()->user();
+        $lang = $user->lang ?? 'ar';
 
         // Check for existing active subscription
         $currentSubscription = Subscription::where('user_id', $user->id)
@@ -44,15 +45,15 @@ class SubscriptionController extends Controller
             $currentExpiresAt = $currentSubscription->created_at->copy()->addMonths($currentSubscription->period_in_months);
 
             // Mark subscription as expired if needed
-            if (!$currentSubscription->is_online || $currentSubscription->expires_at < now() || $currentExpiresAt < now()) {
-                $currentSubscription->update(['is_online' => false]);
+            if ($currentSubscription->is_online || $currentSubscription->expires_at < now() || $currentExpiresAt < now()) {
+                $currentSubscription->update(['is_online' => 0]);
             }
 
             // Prevent new subscription if current is still active and not a guest subscription
             if ($currentExpiresAt > now() && $currentSubscription->type !== 'guest_subscription') {
                 return response()->json([
                     'status' => false,
-                    'message' => 'You already have an active subscription.',
+                    'message' => __('messages.active_subscription', [], $lang),
                     'payment_url' => null,
                     'current_subscription' => [
                         'package' => Package::find($currentSubscription->package_id)->name,
@@ -75,7 +76,7 @@ class SubscriptionController extends Controller
             $paymentUrl = $paymentService->initiatePayment($package, $userData);
             return response()->json([
                 'status' => true,
-                'message' => 'You have no active subscriptions, so you are eligible to subscribe.',
+                'message' => __('messages.eligible_to_subscribe', [], $lang),
                 'payment_url' => $paymentUrl,
                 'current_subscription' => new stdClass()
             ]);
@@ -125,10 +126,10 @@ class SubscriptionController extends Controller
                 // Prepare subscription notification details for the user
                 $notificationDetails = [
                     'id' => $invoice->id ?? 1,
-                    'ar_title' => 'تم تفعيل اشتراكك',
-                    'ar_description' => 'تهانينا! لقد تم تفعيل اشتراكك بنجاح. استمتع بالمزايا الحصرية الآن.',
-                    'en_title' => 'Your Subscription is Active!',
-                    'en_description' => 'Congratulations! Your subscription has been successfully activated. Enjoy your exclusive benefits now.',
+                    'ar_title' => __('messages.subscription_active_title', [], 'ar'),
+                    'ar_description' => __('messages.subscription_active_description', [], 'ar'),
+                    'en_title' => __('messages.subscription_active_title', [], 'en'),
+                    'en_description' => __('messages.subscription_active_description', [], 'en'),
                     'type' => 'subscription',
                     'status' => 'success',
                 ];
@@ -168,9 +169,10 @@ class SubscriptionController extends Controller
 
         if (!$token) {
             return response()->json([
-                'status' => false,
-                'message' => 'Unauthorized or Token has expired, please login again!',
+                'status' => true,
+                'message' => __('messages.unauthorized_or_expired', [], 'ar'),
                 'token_status' => false,
+                'subscription_status' => false,
                 'subscription' => new stdClass(),
             ]);
         }
@@ -179,29 +181,43 @@ class SubscriptionController extends Controller
             // Authenticate user (JWT or Sanctum)
             $accessToken = PersonalAccessToken::findToken($token);
             $user = $accessToken ? $accessToken->tokenable : null;
+            $lang = $user->lang ?? 'ar';
 
             if (!$user) {
                 return response()->json([
-                    'status' => false,
-                    'message' => 'Unauthorized or Token has expired, please login again!',
+                    'status' => true,
+                    'message' => __('messages.unauthorized_or_expired', [], $lang),
                     'token_status' => false,
+                    'subscription_status' => false,
                     'subscription' => new stdClass(),
                 ]);
+            }
+
+            // Case 2: User is deactivated
+            if ($user->is_online == 0) {
+                return response()->json([
+                    'status' => true,
+                    'message' => __('messages.account_deactivated', [], $lang),
+                    'token_status' => false,
+                    'subscription_status' => false,
+                    'subscription' => new stdClass(),
+                ], 200);
             }
 
             // **Check if user is a client**
             if ($user->type === 'client') {
                 // Fetch the latest active subscription for the user
                 $subscription = Subscription::where('user_id', $user->id)
-                    ->where('type', 'user_subscription')
+                    // ->where('type', 'user_subscription')
                     ->latest()
                     ->first();
 
                 if (!$subscription) {
                     return response()->json([
-                        'status' => false,
-                        'message' => 'No subscription found',
+                        'status' => true,
+                        'message' => __('messages.no_subscription', [], $lang),
                         'token_status' => true,
+                        'subscription_status' => false,
                         'subscription' => new stdClass(),
                     ]);
                 }
@@ -210,13 +226,17 @@ class SubscriptionController extends Controller
                 $periodInMonths = $subscription->period_in_months ?? 0;
                 $calculatedExpiresAt = $subscription->created_at->copy()->addMonths($periodInMonths);
 
-                if (!$subscription->is_online || $subscription->expires_at < now() || $calculatedExpiresAt < now()) {
+                if (!$subscription->is_online || $subscription->expires_at < now()) {
                     $subscription->update(['is_online' => false]);
 
+                    if ($subscription->type === 'user_subscription' &&  $calculatedExpiresAt < now()) {
+                        $subscription->update(['is_online' => false]);
+                    }
                     return response()->json([
-                        'status' => false,
-                        'message' => 'Subscription is expired or inactive',
+                        'status' => true,
+                        'message' => __('messages.subscription_expired', [], $lang),
                         'token_status' => true,
+                        'subscription_status' => false,
                         'subscription' => [
                             'user_id' => $user->id,
                             'package' => $subscription->package->name ?? null,
@@ -231,8 +251,9 @@ class SubscriptionController extends Controller
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Subscription is active',
+                    'message' => __('messages.subscription_active', [], $lang),
                     'token_status' => true,
+                    'subscription_status' => true,
                     'subscription' => [
                         'user_id' => $user->id,
                         'package' => $subscription->package->name ?? null,
@@ -248,15 +269,17 @@ class SubscriptionController extends Controller
             // **For non-client users, only check if the token is valid**
             return response()->json([
                 'status' => true,
-                'message' => 'User is authenticated',
+                'message' => __('messages.user_authenticated', [], $lang),
                 'token_status' => true,
+                'subscription_status' => null,
                 'subscription' => new stdClass(),
             ]);
         } catch (Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Invalid or expired token',
+                'message' => __('messages.invalid_token',  [], 'ar'),
                 'token_status' => false,
+                'subscription_status' => null,
                 'subscription' => new stdClass(),
             ]);
         }

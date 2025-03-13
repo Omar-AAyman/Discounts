@@ -3,6 +3,7 @@
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\DelegateController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\OfferNotificationController;
@@ -42,7 +43,7 @@ Route::get('/stores/discount/{uuid}', [StoreController::class, 'showDiscount'])
 
 Route::get("/payments-summary", [PaymentStatusController::class, "show"])->name("payments-summary");
 
-Route::middleware(['auth', 'is_admin'])->group(function () {
+Route::middleware(['auth', 'is_admin', 'checkUserStatus'])->group(function () {
     // ADMIN PANEL ROUTES
     Route::get('/admin', function () {
         return view('admin');
@@ -82,8 +83,15 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/admin/stores-sellers/{seller}/edit', [StoreAndSellerController::class, 'edit'])->name('store-and-seller.edit');
     Route::put('/admin/stores-sellers/{seller}/update', [StoreAndSellerController::class, 'update'])->name('store-and-seller.update');
     Route::delete('/admin/stores-sellers/{seller}', [StoreAndSellerController::class, 'destroy'])->name('store-and-seller.destroy');
+    Route::get('/store-and-seller/qr-pdf/{id}', [StoreAndSellerController::class, 'downloadQrPdf'])
+    ->name('store-and-seller.qr-pdf');
 
-
+    Route::prefix('admin/invoices')->group(function () {
+        Route::get('/', [InvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('/admin/packages/sections', [InvoiceController::class, 'subscriptions'])->name('invoices.subscriptions');
+        Route::get('/products', [InvoiceController::class, 'products'])->name('invoices.products');
+        Route::get('/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
+    });
 
     // sections routes
     Route::get('/admin/sections', [SectionController::class, 'index'])->name('sections.index');
@@ -111,6 +119,7 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     // subscriptions routes
     Route::get('/admin/guestSubscriptions', [SubscriptionController::class, 'displayGuestsSubscribtions'])->name('subscriptions.guestSubscriptions');
     Route::get('/admin/userSubscriptions', [SubscriptionController::class, 'displayUsersSubscribtions'])->name('subscriptions.userSubscriptions');
+    Route::get('/admin/pending/userSubscriptions', [SubscriptionController::class, 'displayPendingUsersSubscribtions'])->name('subscriptions.pendingUserSubscriptions');
     Route::get('/admin/subscriptions/show/subscribe/guest', [SubscriptionController::class, 'showSubscribeGuest'])->name('subscriptions.showSubscribeGuest');
     Route::get('/admin/subscriptions/show/subscribe/user', [SubscriptionController::class, 'showSubscribeUser'])->name('subscriptions.showSubscribeUser');
 
@@ -167,7 +176,7 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::put('/admin/on-boarding/update/{id}', [OnBoardingController::class, 'update'])->name('onboardings.update');
 });
 
-Route::middleware(['auth', 'is_delegate'])->group(function () {
+Route::middleware(['auth', 'is_delegate', 'checkUserStatus'])->group(function () {
     // delegat routes
     Route::get('/main/view', [DelegateController::class, 'mainView'])->name('delegates.mainView');
     Route::get('/create/seller', [DelegateController::class, 'createSeller'])->name('delegates.createSeller');
@@ -176,8 +185,10 @@ Route::middleware(['auth', 'is_delegate'])->group(function () {
     Route::post('/store/{store}/request-delete', [DelegateController::class, 'requestStoreDeletion'])->name('delegates.requestDelete');
     Route::get('/delegates/sellers/{seller}/edit', [DelegateController::class, 'editSeller'])->name('delegates.editSeller');
     Route::put('/delegates/sellers/{seller}', [DelegateController::class, 'updateSeller'])->name('delegates.updateSeller');
+    Route::get('/delegates/sellers/qr-pdf/{id}', [DelegateController::class, 'downloadQrPdf'])
+    ->name('delegates.qr-pdf');
 });
-Route::middleware(['auth', 'admin_or_cs'])->group(function () {
+Route::middleware(['auth', 'admin_or_cs', 'checkUserStatus'])->group(function () {
 
     // tickets routes
     Route::get('tickets', [TicketController::class, 'index'])->name('tickets.index');

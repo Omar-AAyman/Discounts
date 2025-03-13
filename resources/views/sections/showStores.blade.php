@@ -86,7 +86,7 @@
                                             </td>
 
                                             <td>
-                                            <a class="btn btn-primary btn-sm" href="{{route('stores.edit' , ['uuid'=>$store['uuid'] ])}}" >
+                                            <a class="btn btn-primary btn-sm" href="{{route('store-and-seller.edit', ['seller' => $store->user->id])}}" >
                                             Edit
                                               </a>
 

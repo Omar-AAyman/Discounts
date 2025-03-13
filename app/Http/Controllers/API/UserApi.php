@@ -28,16 +28,8 @@ class UserApi extends Controller
             $user->sector_qr = $sector_qr;
             $lastSession = $user->lastSessionBeforeCurrent() ? $user->lastSessionBeforeCurrent()->last_activity : null;
 
-            if ($lastSubscription) {
-                $expiryDate = \Carbon\Carbon::parse($lastSubscription->created_at);
-
-                if ($lastSubscription->type === 'guest_subscription') {
-                    $expiryDate->addDays(7);
-                } else {
-                    $expiryDate->addMonths($lastSubscription->period_in_months);
-                }
-
-                $lastSubscription->expiry_date = $expiryDate->format('Y-m-d');
+            if ($lastSubscription && (!$lastSubscription->is_online || now()->greaterThan($lastSubscription->expires_at))) {
+                $lastSubscription->update(['is_online' => false]); // Mark as inactive if expired
             }
 
             // Return success response with user and token

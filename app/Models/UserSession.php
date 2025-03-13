@@ -20,6 +20,7 @@ class UserSession extends Model
         'type',
         'img',
         'country',
+        'city'
     ];
 
 

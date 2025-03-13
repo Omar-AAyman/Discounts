@@ -16,6 +16,67 @@ use Laravel\Sanctum\PersonalAccessToken;
 class UserSubscription extends Controller
 {
 
+    public function freeSubscription(Request $request)
+{
+    $token = PersonalAccessToken::findToken($request->bearerToken());
+
+    if (!$token || $token->isExpired()) {
+        return response([
+            'status' => false,
+            'message' => 'Token is expired'
+        ], 200);
+    }
+
+    $user = $request->user();
+
+    // Check if user has an active subscription
+    if (Subscription::where('user_id', $user->id)->where('is_online', 1)->exists()) {
+        return response([
+            'status' => false,
+            'message' => 'The user is currently subscribed'
+        ], 200);
+    }
+
+    // Fetch package and free trial days in a single query
+    $options = Option::whereIn('key', ['package_for_guest', 'free_trial_period_in_days'])
+        ->pluck('value', 'key');
+
+    $packageName = $options['package_for_guest'] ?? 'basic';
+    $freeTrialDays = $options['free_trial_period_in_days'] ?? 7; // Default to 7 days if not set
+
+    // Fetch package in one query
+    $package = Package::where('name', $packageName)->first() ?? Package::where('name', 'basic')->first();
+
+    if (!$package) {
+        return response([
+            'status' => false,
+            'message' => 'No valid package found'
+        ], 200);
+    }
+
+    // Ensure free subscription is only granted once
+    if (Subscription::where('user_id', $user->id)->where('type', 'guest_subscription')->exists()) {
+        return response([
+            'status' => false,
+            'message' => 'The user has been subscribed to the free plan before'
+        ], 200);
+    }
+
+    // Create the free guest subscription
+    Subscription::create([
+        'user_id' => $user->id,
+        'package_id' => $package->id,
+        'type' => 'guest_subscription',
+        'expires_at' => now()->addDays($freeTrialDays),
+        'is_online' => 1,
+    ]);
+
+    return response([
+        'status' => true,
+        'message' => "You have been registered for the free plan for {$freeTrialDays} days"
+    ], 200);
+}
+
     public function getSuperPackageCostPerMonth()
     {
         $option = Option::where('key', 'super_cost_per_month')->first();
@@ -159,57 +220,61 @@ class UserSubscription extends Controller
 
 
 
-    public function freeSubscription(Request $request)
-    {
-        if (!PersonalAccessToken::findToken($request->bearerToken())->isExpired()) {
+    // public function freeSubscription(Request $request)
+    // {
+    //     if (!PersonalAccessToken::findToken($request->bearerToken())->isExpired()) {
 
-            $user = $request->user();
+    //         $user = $request->user();
 
 
-            $currentSubscription = Subscription::where('user_id', $user->id)->where('is_online', 1)->first();
+    //         $currentSubscription = Subscription::where('user_id', $user->id)->where('is_online', 1)->first();
 
-            if (!$currentSubscription) {
+    //         if (!$currentSubscription) {
 
-                $package_name = Option::where('key', 'package_for_guest')->first()->value;
-                $package = Package::where('name', $package_name)->first();
-                $guestSubscription = Subscription::where('user_id', $user->id)
-                    ->where('type', 'guest_subscription')->first(); // free subscription only once for each guest
+    //             $package_name = Option::where('key', 'package_for_guest')->first()->value;
+    //             $free_trial_days = Option::where('key', 'free_trial_period_in_days')->first()->value;
 
-                if ($package) {
-                    if (!$guestSubscription) {
-                        Subscription::create([
-                            'user_id' => $user->id,
-                            'package_id' => $package->id,
-                            'type' => 'guest_subscription',
+    //             $package = Package::where('name', $package_name)->first();
+    //             $guestSubscription = Subscription::where('user_id', $user->id)
+    //                 ->where('type', 'guest_subscription')->first(); // free subscription only once for each guest
 
-                        ]);
+    //             if ($package) {
+    //                 if (!$guestSubscription) {
+    //                     Subscription::create([
+    //                         'user_id' => $user->id,
+    //                         'package_id' => $package->id,
+    //                         'type' => 'guest_subscription',
+    //                         'expires_at' => now()->addDays($free_trial_days), // Add free trial days
 
-                        return response([
-                            'status' => true,
-                            'message' => 'You have been registered for the free plan for 7 days',
-                        ], 200);
-                    } else {
-                        return response([
-                            'status' => false,
-                            'message' => 'The user has been subscribed to the free plan before',
-                        ], 200);
-                    }
-                } else {
+    //                     ]);
 
-                    $basic_package = Package::where('name', 'basic')->first();
-                    Subscription::create([
-                        'user_id' => $user->id,
-                        'package_id' => $basic_package->id,
-                        'type' => 'guest_subscription',
-                    ]);
-                }
-            } else {
-                return response(['status' => false, 'message' => 'The user is currently subscribed'], 200);
-            }
-        } else {
-            return response(['status' => false, 'message' => 'Token is expired'], 200);
-        }
-    }
+    //                     return response([
+    //                         'status' => true,
+    //                         'message' => 'You have been registered for the free plan for ' . $free_trial_days . ' days',
+    //                     ], 200);
+    //                 } else {
+    //                     return response([
+    //                         'status' => false,
+    //                         'message' => 'The user has been subscribed to the free plan before',
+    //                     ], 200);
+    //                 }
+    //             } else {
+
+    //                 $basic_package = Package::where('name', 'basic')->first();
+    //                 Subscription::create([
+    //                     'user_id' => $user->id,
+    //                     'package_id' => $basic_package->id,
+    //                     'type' => 'guest_subscription',
+    //                     'expires_at' => now()->addDays($free_trial_days), // Add free trial days
+    //                 ]);
+    //             }
+    //         } else {
+    //             return response(['status' => false, 'message' => 'The user is currently subscribed'], 200);
+    //         }
+    //     } else {
+    //         return response(['status' => false, 'message' => 'Token is expired'], 200);
+    //     }
+    // }
 
     public function currentSubscriptionDetails(Request $request)
     {
@@ -240,8 +305,11 @@ class UserSubscription extends Controller
                     }
                     $isOnline = now()->lessThanOrEqualTo($expiryDate);
                 } elseif ($currentSubscription->type === 'guest_subscription') {
-                    $expiryDate = \Carbon\Carbon::parse($currentSubscription->created_at)->addDays(7)->format('Y-m-d');
-                    $isOnline = now()->lessThanOrEqualTo($expiryDate);
+                    if (!$currentSubscription->is_online || now()->greaterThan($currentSubscription->expires_at)) {
+                        $currentSubscription->update(['is_online' => false]);
+                        $isOnline = false;
+                    }
+                    $isOnline = true;
                 } else {
                     $isOnline = true;
                 }

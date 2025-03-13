@@ -18,3 +18,4 @@ yarn-error.log
 /.vscode
 /storage
 storage/firebase-service-account.json
+storage/firebase-service-account.json

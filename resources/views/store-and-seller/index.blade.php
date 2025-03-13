@@ -34,10 +34,13 @@
                         <thead>
                             <tr style="white-space: nowrap; font-size: 14px;">
                                 <th>Store Image</th>
+                                <th>Store QR</th>
                                 <th>Seller Info</th>
                                 <th>Store Info</th>
                                 <th>Contact Details</th>
+                                <th>Store Points</th>
                                 <th>Created By</th>
+                                <th>Contract</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -69,6 +72,15 @@
                                     <img src="{{ $store && $store->store_img ? $store->store_img : asset('images/default-store.png') }}" alt="Store Image" class="img-thumbnail image">
                                 </td>
                                 <td>
+                                    @if ($store && $store->sector_qr)
+                                    <a href="{{ route('store-and-seller.qr-pdf', ['id' => $store->id]) }}" target="_blank">
+                                        <img src="{{ $store->sector_qr }}" alt="QR Code" class="img-thumbnail image">
+                                    </a>
+                                    @else
+                                    <span class="text-muted">No QR Code</span>
+                                    @endif
+                                </td>
+                                <td>
                                     <strong>Name:</strong> {{ $sellerData->first_name ?? 'N/A' }} {{ $sellerData->last_name ?? '' }}<br>
                                     <strong>ID:</strong> {{ $sellerData->id ?? 'N/A' }}<br>
                                     <strong>Type:</strong> <span class="text-primary">{{ ucfirst($sellerData->seller_type_id ?? 'N/A') }}</span><br>
@@ -87,6 +99,10 @@
                                     <strong>Whatsapp:</strong> {{ $store->phone_number2 }}
                                     @endif
                                 </td>
+                                <td class="text-center">
+                                    <strong style="color: blue;">{{ $store->points ?? 'N/A' }} </strong>
+                                </td>
+
                                 <td>
                                     @if ($delegate)
                                     <a href="{{ route('users.edit', ['uuid' => $delegate->uuid]) }}" class="text-primary">
@@ -98,13 +114,26 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="badge text-white p-2 {{ $statusClass }}">
-                                        <i class="{{ $statusIcon }}"></i>
-                                        {{ ucfirst($status) }}
+                                    @if ($store && $store->contract_img)
+                                    @php $fileExtension = pathinfo($store->contract_img, PATHINFO_EXTENSION); @endphp
+                                    @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                    <a href="{{ $store->contract_img }}" target="_blank" class="btn btn-info btn-sm">Preview</a>
+                                    @elseif ($fileExtension === 'pdf')
+                                    <a href="{{ $store->contract_img }}" target="_blank" class="btn btn-info btn-sm">View PDF</a>
+                                    @endif
+                                    <a href="{{ $store->contract_img }}" download class="btn btn-primary btn-sm">Download</a>
+                                    @else
+                                    <span class="text-muted">No Contract</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <span class="mt-2 badge text-white {{ !empty($store->is_online) ? 'bg-success' : 'bg-danger' }}">
+                                        {{ !empty($store->is_online) ? 'Online' : 'Offline' }}
                                     </span>
                                     <br>
-                                    <span class="badge text-white {{ !empty($sellerData->is_online) ? 'bg-success' : 'bg-secondary' }}">
-                                        {{ !empty($sellerData->is_online) ? 'Online' : 'Offline' }}
+                                    <span class="badge text-white mt-2 p-2 {{ $statusClass }}">
+                                        <i class="{{ $statusIcon }}"></i>
+                                        {{ ucfirst($status) }}
                                     </span>
                                 </td>
                                 <td>

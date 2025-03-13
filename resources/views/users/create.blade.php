@@ -81,7 +81,32 @@
 
                         </div>
                     </div>
+                    <!-- New Country/City dropdown row -->
+                    <div class="row gx-4 mb-4">
+                        <!-- Country dropdown -->
+                        <div class="col-md-6">
+                            <label class="small mb-2" for="country">City <span style="color: red;">*</span></label>
+                            <select name="country" id="country" class="form-control form-select" required>
+                                <option value="">Select City</option>
+                                @foreach($countries as $country)
+                                <option value="{{ $country->id }}" {{ old('country') == $country->id ? 'selected' : '' }}>
+                                    {{ $country->name }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
 
+                        <!-- City dropdown -->
+                        <div class="col-md-6">
+                            <label class="small mb-2" for="city">Area <span style="color: red;">*</span></label>
+                            <select name="city" id="city" class="form-control form-select" required>
+                                <option value="">Select Area</option>
+                            </select>
+                            @error('city')
+                            <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
 
 
                     <div class="row gx-3 mb-3">
@@ -111,4 +136,35 @@
 </main>
 
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const countrySelect = document.getElementById('country');
+        const citySelect = document.getElementById('city');
+        const oldCityId = @json(old('city') ?? null);
+
+        countrySelect.addEventListener('change', function() {
+            const countryId = this.value;
+            citySelect.innerHTML = '<option value="">Select City</option>'; // Reset cities
+
+            if (countryId) {
+                fetch(`/api/cities/${countryId}`)
+                    .then(response => response.json())
+                    .then(cities => {
+                        cities.forEach(city => {
+                            const option = new Option(city.name, city.id);
+                            option.selected = (city.id == oldCityId);
+                            citySelect.add(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching cities:', error));
+            }
+        });
+
+        // Trigger change if country is pre-selected (e.g., form validation failed)
+        if (countrySelect.value) {
+            countrySelect.dispatchEvent(new Event('change'));
+        }
+    });
+
+</script>
 @endsection

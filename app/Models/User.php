@@ -25,7 +25,20 @@ class User extends Authenticatable
             }
         });
     }
+    public function findForPassport($email)
+    {
+        $user = $this->where('email', $email)->first();
 
+        if (!$user) {
+            return null; // User does not exist
+        }
+
+        if ($user->is_online == 0) {
+            return null; // Prevent login if deactivated
+        }
+
+        return $user;
+    }
     /**
      * The attributes that are mass assignable.
      *
@@ -110,7 +123,7 @@ class User extends Authenticatable
         'city_name_ar',
     ];
 
-    
+
     public function countryRelation()
     {
         return $this->belongsTo(Country::class, 'country'); // 'country' is the FK column in stores
