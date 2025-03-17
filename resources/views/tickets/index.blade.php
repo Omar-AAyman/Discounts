@@ -29,12 +29,12 @@
 
                 @if ($tickets->isEmpty())
                     <div class="card-body">
-                        <form method="GET" action="{{ route('tickets.create') }}">
+                        {{-- <form method="GET" action="{{ route('tickets.create') }}"> --}}
                             <div class="col-md-6">
                                 <label class="small mb-1 mr-5" for="max_products">No Tickets</label>
-                                <button type="submit" class="btn btn-primary btn-xs">Add Ticket</button>
+                                {{-- <button type="submit" class="btn btn-primary btn-xs">Add Ticket</button> --}}
                             </div>
-                        </form>
+                        {{-- </form> --}}
                     </div>
                 @else
                     <div class="card-body">
